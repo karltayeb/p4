@@ -9,14 +9,14 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     /** the vertices */
     private ArrayList<GVertex<VT>> verts;
-    private boolean[][] matrix;
+    private ArrayList<ArrayList<WEdge<VT>>> adjlist;
     private int numEdges;
 
     public WGraphP4(int maxVerts) {
         this.nextID = 0;
         this.numEdges = 0;
-        this.verts = new ArrayList<GVertex<VT>>(maxVerts);
-        this.matrix = new boolean[maxVerts][maxVerts];
+        this.verts = new ArrayList<GVertex<VT>>();
+        this.adjlist = new ArrayList<ArrayList<WEdge<VT>>>();
     }
 
     @Override
@@ -25,7 +25,8 @@ public class WGraphP4<VT> implements WGraph<VT> {
     }
 
     @Override
-    public int numEdges() {
+    public int numEdges() { 
+        for
         return this.numEdges;
     }
 
