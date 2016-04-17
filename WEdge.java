@@ -54,6 +54,10 @@ public class WEdge<VT> implements Comparable<WEdge<VT>> {
         return this.end;
     }
 
+    public boolean hasVertex(GVertex<VT> v) {
+        return (this.source.equals(v) || this.end.equals(v));
+    }
+
     /** Create a string representation of the edge.
      *  @return the string as (source,end)
      */

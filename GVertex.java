@@ -26,6 +26,10 @@ public class GVertex<T> implements Comparable<GVertex<T>> {
         return this.num;
     }
 
+    public void setID(int id) {
+        this.num = id;
+    }
+
     /** Get a string representation of the vertex.
      *  @return the string 
      */
