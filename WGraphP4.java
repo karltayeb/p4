@@ -14,7 +14,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     public WGraphP4(int maxVerts) {
         this.nextID = 0;
-        this.numWEdge<VT>s = 0;
+        this.numEdges = 0;
         this.verts = new ArrayList<GVertex<VT>>(maxVerts);
         this.matrix = new boolean[maxVerts][maxVerts];
     }
@@ -26,7 +26,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     @Override
     public int numEdges() {
-        return this.numWEdge<VT>s;
+        return this.numEdges;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
     public boolean addVertex(Object data) {
         if (this.verts.size() == this.matrix.length) // full
             return false;
-        this.verts.add(new GVertex<VT>(data, nextID++));
+        this.verts.add(new GVertex(data, nextID++));
         return true;
     }
 
@@ -55,9 +55,9 @@ public class WGraphP4<VT> implements WGraph<VT> {
     @Override
     public boolean addEdge(WEdge<VT> e) {
         boolean added = false;
-        added = addEdge(e.source(), e.end());
-        if (added && !e.isDirected()) {
-            added = addEdge(e.end(), e.source());
+        added = addEdge(e.source(), e.end(), 1);
+        if (added) {
+            added = addEdge(e.end(), e.source(), 1);
             this.numEdges--;  // don't count it twice
         }
         return added;
@@ -68,9 +68,9 @@ public class WGraphP4<VT> implements WGraph<VT> {
         w = 1; 
         boolean success = true;
         if (!this.verts.contains(v))
-            success = this.addGVertex<VT>(v);
+            success = this.addVertex(v);
         if (success && !this.verts.contains(u))
-            success = this.addGVertex<VT>(u);
+            success = this.addVertex(u);
         if (!success)
             return false;
         // put the edge in, if not already there
