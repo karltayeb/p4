@@ -58,7 +58,7 @@ public class WEdge<VT> implements Comparable<WEdge<VT>> {
      *  @return the string as (source,end)
      */
     public String toString() {
-        return "(" + this.source + "," + this.end + "," + this.weight + ")";
+        return "(" + this.source.toString() + ", " + this.end.toString() + ", " + this.weight + ")";
     }
 
     /** Check if two edges are the same.
@@ -93,6 +93,22 @@ public class WEdge<VT> implements Comparable<WEdge<VT>> {
             return -1;
         }
         return 0;
+    }
+    
+    /** Gets the weight of WEdge.
+     * 
+     * @return the weight (double)
+     */
+    public double weight(){
+        return this.weight;
+    }
+    
+    /** Sets the weight of the WEdge to a new (double)
+     * 
+     * @param x : the new weight
+     */
+    public void setWeight(double x){
+        this.weight = x;
     }
 
 }
