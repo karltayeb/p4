@@ -1,6 +1,6 @@
 /** Class to represent a vertex (in a graph).
  */
-public class GVertex<T extends Comparable<T>> implements Comparable<GVertex<T>> {
+public class GVertex<T> implements Comparable<GVertex<T>> {
 
     /* Note that the nextID variable had to be moved to the graph class. */
 

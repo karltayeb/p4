@@ -1,154 +1,185 @@
 import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
-/** Interface for a weighted undirected graph.
- *  @param <VT> the type of data stored in each vertex
- */
-public class WGraphP4<VT> {
+public class WGraphP4<VT> implements WGraph<VT> {
 
     /** Used to sequentially generate vertex IDs for this graph! */
     private int nextID;
 
     /** the vertices */
     private ArrayList<GVertex<VT>> verts;
-    /** adjacency list */
-    private ArrayList<WEdge<VT>> adjlist;
-
+    private boolean[][] matrix;
     private int numEdges;
 
-
-    public WGraphp4() {
+    public WGraphP4(int maxVerts) {
         this.nextID = 0;
-        this.numEdges = 0;
-        this.verts = new ArrayList<GVertex<VT>>();
-        this.adjlist = new ArrayList<WEdge<VT>>();
-    }
-    /** Get the number of edges. 
-     *  @return the number
-     */
-    int numEdges() {
-        return this.numEdges;
+        this.numWEdge<VT>s = 0;
+        this.verts = new ArrayList<GVertex<VT>>(maxVerts);
+        this.matrix = new boolean[maxVerts][maxVerts];
     }
 
-    /** Get the number of vertices. 
-     *  @return the number
-     */
-    int numVerts() {
-        return this.vers.size();
+    @Override
+    public int numVerts() {
+        return this.verts.size();
     }
 
-    /** Get the next ID to use in making a vertex. 
-     *  @return the id
-     */
-    int nextID() {
-        return this.nextID;
+    @Override
+    public int numEdges() {
+        return this.numWEdge<VT>s;
     }
 
-    /** Create and add a vertex to the graph.
-     *  @param d the data to store in the vertex
-     *  @return true if successful, false otherwise
-     */
-    boolean addVertex(VT d) {
-        GVertex<VT> v = new GVertex<VT>(d, this.nextID++);
-        return this.verts.add(v);        
+    @Override
+    public int nextID() {
+        return nextID++;
     }
 
-    /** Add a vertex if it doesn't exist yet. 
-     *  @param v the vertex to add
-     *  @return false if already there, true if added
-     */
-    boolean addVertex(GVertex<VT> v) {
+    @Override
+    public boolean addVertex(Object data) {
+        if (this.verts.size() == this.matrix.length) // full
+            return false;
+        this.verts.add(new GVertex<VT>(data, nextID++));
+        return true;
+    }
+
+    @Override
+    public boolean addVertex(GVertex<VT> v) {
+        if (this.verts.size() == this.matrix.length) // full
+            return false;
+        if (this.verts.contains(v))
+            return false;  // there 
+        this.verts.add(v);
+        return true;
+    }
+    
+    @Override
+    public boolean addEdge(WEdge<VT> e) {
+        boolean added = false;
+        added = addEdge(e.source(), e.end());
+        if (added && !e.isDirected()) {
+            added = addEdge(e.end(), e.source());
+            this.numEdges--;  // don't count it twice
+        }
+        return added;
+    }
+
+    @Override
+    public boolean addEdge(GVertex<VT> v, GVertex<VT> u, double w) {
+        w = 1; 
+        boolean success = true;
+        if (!this.verts.contains(v))
+            success = this.addGVertex<VT>(v);
+        if (success && !this.verts.contains(u))
+            success = this.addGVertex<VT>(u);
+        if (!success)
+            return false;
+        // put the edge in, if not already there
+        if (! this.matrix[v.id()][u.id()]) {
+            this.matrix[v.id()][u.id()] = true;
+            this.numEdges++;
+            return true;
+        }
+        return false;  // was already there
+    }
+
+    @Override
+    public boolean deleteEdge(GVertex<VT> v, GVertex<VT> u) {
+        if (this.verts.contains(v) && this.verts.contains(u)) {
+            if (this.matrix[v.id()][u.id()]) {
+                this.matrix[v.id()][u.id()] = false;
+                this.numEdges--;
+                return true;
+            }
+        }
         return false;
     }
 
-    /** Add a weighted edge, may also add the incident vertices. 
-     *  @param e the edge to add
-     *  @return false if already there, true if added
-     */
-    boolean addEdge(WEdge<VT> e) {
-        return false;
+    @Override
+    public boolean areAdjacent(GVertex<VT> v, GVertex<VT> u) {
+        return this.matrix[v.id()][u.id()];
     }
 
-    /** Add a weighted edge, may also add vertices. 
-     *  @param v the starting vertex
-     *  @param u the ending vertex
-     *  @param weight the weight of the edge
-     *  @return false if already there, true if added
-     */
-    boolean addEdge(GVertex<VT> v, GVertex<VT> u, double weight) {
-        return false;
+    @Override
+    public ArrayList<GVertex<VT>> neighbors(GVertex<VT> v) {
+        ArrayList<GVertex<VT>> nbs = new ArrayList<GVertex<VT>>(this.numVerts());
+        int row = v.id();
+        for (int col=0; col < matrix.length; col++) {
+            if (this.matrix[row][col]) {
+                // add vertex associated with col to nbs
+                nbs.add(this.verts.get(col));
+            }
+        }
+        return nbs;
     }
 
-    /** Remove an edge if there.  
-     *  @param v the starting vertex
-     *  @param u the ending vertex
-     *  @return true if delete, false if wasn't there
-     */
-    boolean deleteEdge(GVertex<VT> v, GVertex<VT> u) {
-        return false;
+    @Override
+    public int degree(GVertex<VT> v) {
+        return this.neighbors(v).size();
     }
 
-    /** Return true if there is an edge between v and u. 
-     *  @param v the starting vertex
-     *  @param u the ending vertex
-     *  @return true if there is an edge between them, false otherwise
-     */
-    boolean areAdjacent(GVertex<VT> v, GVertex<VT> u) {
-        return false;
+    @Override
+    public boolean areIncident(WEdge<VT> e, GVertex<VT> v) {
+        return e.source().equals(v) || e.end().equals(v);
     }
 
-    /** Return a list of all the neighbors of vertex v.  
-     *  @param v the vertex source
-     *  @return the neighboring vertices
-     */
-    List<GVertex<VT>> neighbors(GVertex<VT> v) {
-        return false;
+    @Override
+    public List<WEdge<VT>> allEdges() {
+        int nv = this.numVerts();
+        ArrayList<WEdge<VT>> edges = new ArrayList<WEdge<VT>>(nv);
+        for (int r = 0; r < nv; r++) {
+            for (int c = 0; c < nv; c++) {
+                if (this.matrix[r][c]) {
+                    // there is an edge, add to list
+                    edges.add(new WEdge<VT>(this.verts.get(r), this.verts.get(c)));
+                }
+                // will create duplicate edges for an undirected graph
+            }
+        }
+        return edges;
     }
 
-    /** Return the number of edges incident to v.  
-     *  @param v the vertex source
-     *  @return the number of incident edges
-     */
-    int degree(GVertex<VT> v) {
-        return false;
+    @Override
+    public List<GVertex<VT>> allVertices() {
+        return this.verts;
     }
 
-    /** See if an edge and vertex are incident to each other.
-     *  @param e the edge
-     *  @param v the vertex to check
-     *  @return true if v is an endpoint of edge e
-     */
-    boolean areIncident(WEdge<VT> e, GVertex<VT> v) {
-        return false;
+    public List<GVertex<VT>> depthFirst(GVertex<VT> v) {
+        ArrayList<GVertex<VT>> reaches = new ArrayList<GVertex<VT>>(this.numVerts());
+        // using LinkedList<GVertex<VT>> as a Stack
+        LinkedList<GVertex<VT>> stack = new LinkedList<GVertex<VT>>();
+        boolean[] visited = new boolean[this.numVerts()];  // inits to false
+        stack.addFirst(v);
+        visited[v.id()] = true;
+        while (! stack.isEmpty()) {
+            v = stack.removeFirst();
+            reaches.add(v);
+            for (GVertex<VT> u: this.neighbors(v)) {
+                if (! visited[u.id()]) {
+                    visited[u.id()] = true;
+                    stack.addFirst(u);
+                }
+            }
+        }
+        return reaches;
     }
 
-    /** Return a list of all the edges.  
-     *  @return the list
-     */
-    List<WEdge<VT>> allEdges();
 
-    /** Return a list of all the vertices.  
-     *  @return the list
-     */
-    List<GVertex<VT>> allVertices();
-
-    /** Return a list of all the vertices that can be reached from v,
-     *  in the order in which they would be visited in a depth-first
-     *  search starting at v.  
-     *  @param v the starting vertex
-     *  @return the list of reachable vertices
-     */
-    List<GVertex<VT>> depthFirst(GVertex<VT> v);
 
     /** Return a list of all the edges incident on vertex v.  
      *  @param v the starting vertex
      *  @return the incident edges
      */
-    List<WEdge<VT>> incidentEdges(GVertex<VT> v);
+    @Override
+    public List<WEdge<VT>> incidentEdges(GVertex<VT> v) {
+        return null;
+    }
 
     /** Return a list of edges in a minimum spanning forest by
      *  implementing Kruskal's algorithm using fast union/finds.
      *  @return a list of the edges in the minimum spanning forest
      */
-    List<WEdge<VT>> kruskals();
-    
+    @Override
+    public List<WEdge<VT>> kruskals() {
+        return null;
+    }
 }

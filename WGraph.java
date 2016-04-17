@@ -30,7 +30,7 @@ public interface WGraph<VT> {
      *  @param v the vertex to add
      *  @return false if already there, true if added
      */
-    boolean addVertex(Vertex v);
+    boolean addVertex(GVertex<VT> v);
 
     /** Add a weighted edge, may also add the incident vertices. 
      *  @param e the edge to add
