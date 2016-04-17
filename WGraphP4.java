@@ -27,7 +27,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
     @Override
     public int numEdges() {
         int count = 0; 
-        for (list : adjlist) {
+        for (ArrayList<WEdge<VT>> list : adjlist) {
             count += list.size();
         }
         return count;
@@ -51,7 +51,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
         if (this.verts.contains(v)) {
             return false;  // there 
         }
-        this.vert.setID(this.nextID++);
+        v.setID(this.nextID++);
         this.verts.add(v);
         // add adjacency list for this vertex, inex should corresponds with vertex ID
         this.adjlist.add(new ArrayList<WEdge<VT>>());
@@ -100,8 +100,8 @@ public class WGraphP4<VT> implements WGraph<VT> {
                 if (entry.hasVertex(u)) {
                     // remove edge from both vertices ajdacency lists
                     // TODO check if this works (does source/end matter here?)
-                    this.adjlist(u.id()).remove(entry);
-                    this.adjlist(v.id()).remove(entry);
+                    this.adjlist.get(u.id()).remove(entry);
+                    this.adjlist.get(v.id()).remove(entry);
                     return true;
                 }
             }
