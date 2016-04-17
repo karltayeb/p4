@@ -25,9 +25,12 @@ public class WGraphP4<VT> implements WGraph<VT> {
     }
 
     @Override
-    public int numEdges() { 
-        for
-        return this.numEdges;
+    public int numEdges() {
+        int count = 0; 
+        for (list : adjlist) {
+            count += list.size();
+        }
+        return count;
     }
 
     @Override
