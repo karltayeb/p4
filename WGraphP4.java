@@ -26,11 +26,14 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     @Override
     public int numEdges() {
+        /**
         int count = 0; 
         for (ArrayList<WEdge<VT>> list : adjlist) {
             count += list.size();
         }
-        return count;
+        return count/2;
+        */
+        return this.numEdges;
     }
 
     @Override
@@ -46,12 +49,12 @@ public class WGraphP4<VT> implements WGraph<VT> {
         return true;
     }
 
+
     @Override
     public boolean addVertex(GVertex<VT> v) {
         if (this.verts.contains(v)) {
             return false;  // there 
         }
-        v.setID(this.nextID++);
         this.verts.add(v);
         // add adjacency list for this vertex, inex should corresponds with vertex ID
         this.adjlist.add(new ArrayList<WEdge<VT>>());
@@ -80,6 +83,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
             success = this.addVertex(u);
         if (!success)
             return false;
+
         // put the edge in, if not already there
         boolean edgeExists = this.areAdjacent(v, u);
         if (!edgeExists) {
@@ -102,6 +106,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
                     // TODO check if this works (does source/end matter here?)
                     this.adjlist.get(u.id()).remove(entry);
                     this.adjlist.get(v.id()).remove(entry);
+                    this.numEdges--;
                     return true;
                 }
             }
@@ -112,6 +117,12 @@ public class WGraphP4<VT> implements WGraph<VT> {
     @Override
     public boolean areAdjacent(GVertex<VT> v, GVertex<VT> u) {
         // You only need to check one list, since they should both be there
+        if (this.adjlist.isEmpty()) {
+            return false;
+        }
+        if (this.adjlist.get(v.id()).isEmpty()) {
+            return false;
+        }
         for (WEdge<VT> entry : this.adjlist.get(v.id())) {
             if (entry.hasVertex(u)) {
                 return true;
