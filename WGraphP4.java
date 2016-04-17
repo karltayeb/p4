@@ -58,20 +58,21 @@ public class WGraphP4<VT> implements WGraph<VT> {
         return true;
     }
     
+    /**
+     * @author Richard
+     */
     @Override
     public boolean addEdge(WEdge<VT> e) {
         boolean added = false;
-        added = addEdge(e.source(), e.end(), 1);
-        if (added) {
-            added = addEdge(e.end(), e.source(), 1);
-            this.numEdges--;  // don't count it twice
-        }
+        added = this.addEdge(e.source(), e.end(), e.weight());
         return added;
     }
 
+    /**
+     * @author Richard
+     */
     @Override
     public boolean addEdge(GVertex<VT> v, GVertex<VT> u, double w) {
-        w = 1; 
         boolean success = true;
         if (!this.verts.contains(v))
             success = this.addVertex(v);
@@ -80,14 +81,17 @@ public class WGraphP4<VT> implements WGraph<VT> {
         if (!success)
             return false;
         // put the edge in, if not already there
-        if (! this.matrix[v.id()][u.id()]) {
-            this.matrix[v.id()][u.id()] = true;
+        boolean edgeExists = this.areAdjacent(v, u);
+        if (!edgeExists) {
+            this.adjlist.get(v.id()).add(new WEdge<VT>(v, u, w));
+            this.adjlist.get(u.id()).add(new WEdge<VT>(v, u, w));
             this.numEdges++;
             return true;
         }
         return false;  // was already there
     }
 
+    
     @Override
     public boolean deleteEdge(GVertex<VT> v, GVertex<VT> u) {
         if (this.areAdjacent(v, u)) {
@@ -118,15 +122,17 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     @Override
     public ArrayList<GVertex<VT>> neighbors(GVertex<VT> v) {
-        ArrayList<GVertex<VT>> nbs = new ArrayList<GVertex<VT>>(this.numVerts());
-        int row = v.id();
-        for (int col=0; col < matrix.length; col++) {
-            if (this.matrix[row][col]) {
-                // add vertex associated with col to nbs
-                nbs.add(this.verts.get(col));
+        ArrayList<GVertex<VT>> temp = new ArrayList<GVertex<VT>>();
+        for (WEdge<VT> marker: this.adjlist.get(v.id())) {
+            if(marker.source().id() != v.id()) {
+                //the "source" vertex is the other vertex of the edge, not "v"
+                temp.add(marker.source());
+            } else {
+                //the "end" vertex is the other vertex of the edge, not "v"
+                temp.add(marker.end());
             }
         }
-        return nbs;
+        return temp;
     }
 
     @Override

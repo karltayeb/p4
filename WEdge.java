@@ -9,7 +9,7 @@ public class WEdge<VT> implements Comparable<WEdge<VT>> {
     /** Weight of the edge */
     private double weight;
 
-    /** Create an ndirected edge.
+    /** Create an undirected edge.
      *  @param u the start
      *  @param v the end
      */
@@ -79,14 +79,13 @@ public class WEdge<VT> implements Comparable<WEdge<VT>> {
         }
         return false;
     }
-
+    
     /** Make a hashCode based on the toString.
      *  @return the hashCode
      */
     public int hashCode() {
         return this.toString().hashCode();
     }
-
 
     @Override
     public int compareTo(WEdge<VT> other) {
