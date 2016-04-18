@@ -11,7 +11,7 @@ import java.lang.Math;
 import java.util.List;
 import java.util.LinkedList;
 
-public class PQTest {
+public class PQTestKarl {
 	static PQHeap<Integer> empty;
 	static PQHeap<Integer> smalltolarge;
 	static PQHeap<Integer> largetosmall;
