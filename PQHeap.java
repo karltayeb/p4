@@ -27,12 +27,14 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
     /** Default Constructor */
     public PQHeap() {
     	this.heap = new ArrayList();
+    	this.heap.add(null);
         this.c = new DefaultComparator();
     }
 
     /** Constructor with comparator */
     public PQHeap(Comparator<T> comparator) {
     	this.heap = new ArrayList();
+    	this.heap.add(null);
         this.c = comparator;
     }
     /** Insert a value. Duplicate values <b>do</b> end up in the
@@ -50,19 +52,19 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
      *  @throws QueueEmptyException If queue is empty.
      */
     public void remove() throws QueueEmptyException {
-        if (this.heap.size() == 0) {
+        if (this.heap.size() == 1) {
             throw new QueueEmptyException();
         }
         // If there is only one element
-        if (this.heap.size() == 1) {
-            this.heap.remove(0);
+        if (this.heap.size() == 2) {
+            this.heap.remove(1);
         } else {
             // If there is more than one, replace with the bottom element
             // and bubble down
             int last = this.heap.size() - 1; // get last index
-            this.heap.set(0,heap.get(last)); // swap last value to top of heap
+            this.heap.set(1, heap.get(last)); // swap last value to top of heap
             this.heap.remove(last); // remove the last one
-            this.bubbleDown(0); // bubble down from the top
+            this.bubbleDown(1); // bubble down from the top
         }
     }
     
@@ -73,37 +75,67 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
      *  @throws QueueEmptyException If queue is empty.
      */
     public T peek() throws QueueEmptyException {
-        if (this.heap.size() == 0) {
+        if (this.heap.size() == 1) {
             throw new QueueEmptyException();
         }
-        return this.heap.get(0); 
+        return this.heap.get(1); 
     }
     
     /** No elements?
      *  @return True if queue is empty, false otherwise.
      */
      public boolean isEmpty() {
-        return (this.heap.size() == 0);
+        return (this.heap.size() == 1);
      }
 
     /** Get the number of elements in the queue.
      *  @return the numbers
      */
     public int size() {
-        return this.heap.size();
+        return this.heap.size() - 1;
     }
 
     /** Dump the contents of the priority queue.
      */
     public void clear() {
         this.heap.clear();
+        this.heap.add(null);
     }
 
     /** Initialize a priority queue from a container of values.
      *  @param values the collection of starting values
      */
     public void init(Collection<T> values) {
-        return;
+        this.clear();  // first clear the arraylist
+        this.heap.addAll(values); // add all the values to the heap
+        int lastIndex = this.heap.size() - 1;
+		int level = (int) (Math.floor(Math.log(lastIndex) / Math.log(2) + 1e-10));
+        int start = (int) (Math.pow(2, level) + 1e-10);
+        int offset = lastIndex - start;
+
+        // perform the first round of bubbling only on valid indeces
+        for (int i = lastIndex; i >= (start); i--) {
+        	int parentIndex = this.getParentIndex(i);
+            if (c.compare(this.heap.get(i), this.heap.get(i)) > 0) {
+	            T temp = this.heap.get(i);
+	            this.heap.set(i, this.heap.get(parentIndex));
+	            this.heap.set(parentIndex, temp);           
+        	}    	
+        }
+
+        while(level > 0) {
+        	level--;
+        	start = (int) (Math.pow(2, level) + 1e-10);
+        	offset  = (int) (Math.pow(2, level + 1) + 1e-10) - 1;
+        	for (int i = offset; i >= start; i--) {
+        		int parentIndex = this.getParentIndex(i);
+	            if (c.compare(this.heap.get(i), this.heap.get(i)) > 0) {
+		            T temp = this.heap.get(i);
+		            this.heap.set(i, this.heap.get(parentIndex));
+		            this.heap.set(parentIndex, temp);           
+	        	}            		
+        	}
+        }
     }
 
 
@@ -111,7 +143,7 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
      *  @param index the index we want to bubble up
      */
     private void bubbleUp(int index) {
-        if (index == 0) {
+        if (index == 1) {
             return; // no parent
         }
         int parentIndex = this.getParentIndex(index);
@@ -135,7 +167,7 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
         }
         // if both children are valid, check which one to swap with
         if ((childIndex + 1) < this.heap.size()) {
-            if (this.heap.get(childIndex).compareTo(this.heap.get(childIndex+1)) < 0) {
+        	if(c.compare(this.heap.get(childIndex), this.heap.get(childIndex + 1)) < 0) {
                 childIndex += 1; // switch to the second child
             }
         }
@@ -153,40 +185,34 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
      *  @param index int index in the heap array we want the parent of
      *  @return index of the parent entry
      */
-    private int getParentIndex(int index) {
-        if (index == 0) {
-            return 0;
+    public int getParentIndex(int index) {
+        if (index == 1) {
+            return 1;
         }
         // Every odd index shares a parent with an even index
         if (index % 2 == 1) {
-            index += 1;
+            index -= 1;
         }
 
-        int level = (int)Math.floor(Math.log(index) / Math.log(2) + 1e-10); // level in heap of parent
+        int plevel = (int)Math.floor(Math.log(index) / Math.log(2) + 1e-10) - 1; // level of parent in heap
         // the first index at the level
-        int levelstart = (int)(Math.pow(2, level - 1) - 1 + 1e-10);
-        int offset = (index % (int)(Math.pow(2, level) + 1e-10)) / 2;  // positions over level start
-        return levelstart + offset;  // index of parent
-
-
+        int plevelstart = (int)(Math.pow(2, plevel) + 1e-10);
+        int poffset = (index % (int)(Math.pow(2, plevel) + 1e-10)) / 2;  // positions over level start
+        return plevelstart + poffset;  // index of parent
     }
 
     /** Returns index of first child entry in heap given index.
      *  @param index int index in the heap array we want the child of
      *  @return index of the first child entry
      */
-    private int getChildIndex(int index) {
+    public int getChildIndex(int index) {
         // Level of parentMath.floor(Math.log(index + 1) / Math.log(2) + 1e-10) + 1;
-        int plevel = (int) Math.floor(Math.log(index + 1) / Math.log(2) + 1 + 1e-10);
+        int level = (int) (Math.floor(Math.log(index) / Math.log(2) + 1e-10));
         // Offset of parent
-        int poffset = (int)((index + 1) % (int)(Math.pow(2, plevel - 1) + 1e-10));
+        int offset = index - (int)(Math.pow(2, level) + 1e-10);
         // Level of child
-        int clevel = plevel + 1;
-        // Offset of first child
-        int coffset = clevel + (2 * poffset);
-        // the first index at child level
-        int clevelstart = (int)(Math.pow(2, clevel - 1) - 1 + 1e-10);
-        int childIndex = clevelstart + coffset;
+        int clevel = level + 1;
+        int childIndex = (int)(Math.pow(2, clevel) + 1e-10) + (offset * 2);
     	// Ensure that we can get to it and it's sibling in the heap
         this.heap.ensureCapacity(childIndex + 2); 
         return childIndex; // index of first child in heap
