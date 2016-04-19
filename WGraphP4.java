@@ -176,12 +176,13 @@ public class WGraphP4<VT> implements WGraph<VT> {
         return this.verts;
     }
 
+    //TODO
     public List<GVertex<VT>> depthFirst(GVertex<VT> v) {
         return null;
     }
 
 
-
+    //TODO
     /** Return a list of all the edges incident on vertex v.  
      *  @param v the starting vertex
      *  @return the incident edges
@@ -191,12 +192,49 @@ public class WGraphP4<VT> implements WGraph<VT> {
         return null;
     }
 
+    //TODO
     /** Return a list of edges in a minimum spanning forest by
      *  implementing Kruskal's algorithm using fast union/finds.
      *  @return a list of the edges in the minimum spanning forest
      */
     @Override
     public List<WEdge<VT>> kruskals() {
+        List<WEdge<VT>> edges = this.allEdges();
+        int[] roots = new int[this.allVertices().size()];
+        //roots is the array that holds the roots of each node (Gvertex);
+        
+        //heap contains all the edges of the graph
+        PQHeap<WEdge<VT>> heap = new PQHeap<WEdge<VT>>();
+        for (int i = 0; i < edges.size(); i++) {
+            //add all edges into min-heap
+            heap.insert(edges.remove(0));
+        }
+        
+        WEdge<VT> temp;
+        int sourceID, endID;
+        //Use removemin() to process edges correctly
+        for (int i = 0; i< heap.size(); i++) {
+            temp = heap.peek(); //finds the min Edge
+            sourceID = temp.source().id();
+            endID = temp.end().id();
+            if (sourceID != endID) {  //Union Nodes  
+                roots[endID] = sourceID;
+            }
+            heap.remove();  //removes the proccessed min Edge
+        }
+        
         return null;
+    }
+    
+    public static void main (String[] args){
+        WGraphP4<Character> g = new WGraphP4<Character>(100);
+        GVertex<Character> v = new GVertex<Character>('v', g.nextID());
+        GVertex<Character> u = new GVertex<Character>('u', g.nextID());
+        GVertex<Character> x = new GVertex<Character>('x', g.nextID());
+        g.addVertex(v);
+        g.addVertex(u);
+        g.addVertex(x);
+        System.out.println(g.allVertices().get(1).id());
+        g.kruskals();
     }
 }
