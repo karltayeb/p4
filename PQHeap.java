@@ -106,35 +106,24 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
      *  @param values the collection of starting values
      */
     public void init(Collection<T> values) {
-        this.clear();  // first clear the arraylist
+        this.clear();  // first clear the heap
         this.heap.addAll(values); // add all the values to the heap
-        int lastIndex = this.heap.size() - 1;
-		int level = (int) (Math.floor(Math.log(lastIndex) / Math.log(2) + 1e-10));
-        int start = (int) (Math.pow(2, level) + 1e-10);
-        int offset = lastIndex - start;
 
-        // perform the first round of bubbling only on valid indeces
-        for (int i = lastIndex; i >= (start); i--) {
-        	int parentIndex = this.getParentIndex(i);
-            if (c.compare(this.heap.get(i), this.heap.get(i)) > 0) {
-	            T temp = this.heap.get(i);
-	            this.heap.set(i, this.heap.get(parentIndex));
-	            this.heap.set(parentIndex, temp);           
-        	}    	
-        }
+        int lastIndex = this.heap.size() - 1;
+
+		int level = (int) (Math.floor(Math.log(lastIndex) / Math.log(2) + 1e-10));
+        int levelstart = (int) (Math.pow(2, level) + 1e-10);
+        int levelend = lastIndex;
 
         while(level > 0) {
-        	level--;
-        	start = (int) (Math.pow(2, level) + 1e-10);
-        	offset  = (int) (Math.pow(2, level + 1) + 1e-10) - 1;
-        	for (int i = offset; i >= start; i--) {
-        		int parentIndex = this.getParentIndex(i);
-	            if (c.compare(this.heap.get(i), this.heap.get(i)) > 0) {
-		            T temp = this.heap.get(i);
-		            this.heap.set(i, this.heap.get(parentIndex));
-		            this.heap.set(parentIndex, temp);           
-	        	}            		
-        	}
+            level--;
+            levelstart = (int) (Math.pow(2, level) + 1e-10);
+            levelend = (int) (Math.pow(2, level + 1) + 1e-10) - 1;
+
+        	for (int i = levelstart; i <= levelend; i++) {
+        		int childIndex = this.getChildIndex(i);
+                this.bubbleDown(i);
+            }
         }
     }
 
@@ -162,7 +151,7 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
     private void bubbleDown(int index) {
         int childIndex = this.getChildIndex(index);
         // if we are at the bottom of the heap (both children out of bounds)
-        if (childIndex >= this.heap.size()) {
+        if (childIndex > (this.heap.size() - 1)) {
             return;
         }
         // if both children are valid, check which one to swap with
@@ -171,7 +160,6 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
                 childIndex += 1; // switch to the second child
             }
         }
-
         // Swap and continue bubble down if we should
         if (c.compare(this.heap.get(index), this.heap.get(childIndex)) < 0) {
             T temp = this.heap.get(index);
@@ -194,10 +182,12 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
             index -= 1;
         }
 
-        int plevel = (int)Math.floor(Math.log(index) / Math.log(2) + 1e-10) - 1; // level of parent in heap
+        int level = (int)Math.floor(Math.log(index) / Math.log(2) + 1e-10); // level index in heap
+        int offset = index % (int)(Math.pow(2,level) + 1e-10);
+        int plevel = level - 1;
         // the first index at the level
         int plevelstart = (int)(Math.pow(2, plevel) + 1e-10);
-        int poffset = (index % (int)(Math.pow(2, plevel) + 1e-10)) / 2;  // positions over level start
+        int poffset = offset / 2;  // positions over level start
         return plevelstart + poffset;  // index of parent
     }
 
@@ -206,13 +196,14 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
      *  @return index of the first child entry
      */
     public int getChildIndex(int index) {
-        // Level of parentMath.floor(Math.log(index + 1) / Math.log(2) + 1e-10) + 1;
+        // Level of current index
         int level = (int) (Math.floor(Math.log(index) / Math.log(2) + 1e-10));
-        // Offset of parent
-        int offset = index - (int)(Math.pow(2, level) + 1e-10);
+        // Offset of current index
+        int offset = index % (int)(Math.pow(2, level) + 1e-10);
         // Level of child
         int clevel = level + 1;
         int childIndex = (int)(Math.pow(2, clevel) + 1e-10) + (offset * 2);
+
     	// Ensure that we can get to it and it's sibling in the heap
         this.heap.ensureCapacity(childIndex + 2); 
         return childIndex; // index of first child in heap
@@ -222,5 +213,29 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
         public int compare(T t1, T t2) {
             return t1.compareTo(t2);
         }
+    }
+
+    private boolean isHeap() {
+        return this.isHeap(1);
+    }
+
+    private boolean isHeap(int index) {
+        int child = this.getChildIndex(index);
+        //check both childrent
+        if (child >= this.heap.size()) {
+            return true;
+        }
+        if (child+1 >= this.heap.size()) {
+            return true;
+        }
+
+        if (c.compare(this.heap.get(index), this.heap.get(child)) >= 0 && c.compare(this.heap.get(index), this.heap.get(child+1)) >= 0) {
+            return this.isHeap(child) && this.isHeap(child+1);
+        }
+        return false;
+    }
+
+    public String toString() {
+        return this.heap.toString() + this.isHeap();
     }
 }
