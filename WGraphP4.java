@@ -1,6 +1,9 @@
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Stack;
+import java.util.Set;
+import java.util.HashSet;
 
 public class WGraphP4<VT> implements WGraph<VT> {
 
@@ -178,7 +181,30 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     //TODO
     public List<GVertex<VT>> depthFirst(GVertex<VT> v) {
-        return null;
+        boolean bool = true;
+        List<GVertex<VT>> vlist = new ArrayList<GVertex<VT>>();
+        Stack slist = new Stack();
+        Set<GVertex<VT>> visited = new HashSet();
+        slist.push(v);
+       
+        while(!slist.empty()){
+            GVertex<VT> newV = (GVertex<VT>)slist.pop();
+            if(!visited.contains(newV)) {
+                visited.add(newV);
+                vlist.add(newV);
+ 
+                ArrayList<GVertex<VT>> nlist = neighbors(newV);    
+                for(int i = 0; i < nlist.size(); i++) {
+                    GVertex<VT> neighbor = nlist.get(i);
+                    if (!visited.contains(neighbor)) {
+                        slist.push(neighbor);
+                    }
+                }
+            }
+
+        }
+        return vlist;
+        
     }
 
 
