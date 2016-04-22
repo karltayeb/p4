@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Set;
@@ -226,16 +227,21 @@ public class WGraphP4<VT> implements WGraph<VT> {
     @Override
     public List<WEdge<VT>> kruskals() {
         List<WEdge<VT>> edges = this.allEdges();
-        int[] roots = new int[this.allVertices().size()];
         //roots is the array that holds the roots of each node (Gvertex);
-        
+        int[] roots = new int[this.allVertices().size()];
+        for (int i = 0; i< roots.length; i++){
+            roots[i] = i;
+        }
+        //each node is its own root initially
+                
         //heap contains all the edges of the graph
-        PQHeap<WEdge<VT>> heap = new PQHeap<WEdge<VT>>();
+        PQHeap<WEdge<VT>> heap = new PQHeap<WEdge<VT>>(new ReverseComparator());
         for (int i = 0; i < edges.size(); i++) {
             //add all edges into min-heap
             heap.insert(edges.remove(0));
         }
         
+        List<WEdge<VT>> MST = new ArrayList<WEdge<VT>>();
         WEdge<VT> temp;
         int sourceID, endID;
         //Use removemin() to process edges correctly
@@ -243,13 +249,46 @@ public class WGraphP4<VT> implements WGraph<VT> {
             temp = heap.peek(); //finds the min Edge
             sourceID = temp.source().id();
             endID = temp.end().id();
-            if (sourceID != endID) {  //Union Nodes  
+            if (findRoot(roots, sourceID) != findRoot(roots, endID)) {  
+                //Union Nodes if different roots  
                 roots[endID] = sourceID;
+                //if different roots, then edge is part of MST
+                MST.add(temp);
             }
             heap.remove();  //removes the proccessed min Edge
         }
         
-        return null;
+        return MST;
+    }
+    
+    /** For the min-heap.
+     * 
+     * @author Richard
+     *
+     * @param <T>
+     */
+    private static class ReverseComparator<T extends Comparable<T>> implements Comparator<T> {
+        public int compare(T t1, T t2) {
+            return t2.compareTo(t1);
+        }
+    }
+    
+    /** A small private method for tracing through an array to find 
+     * the root of a node.  Specifically for use in the kruskals() method. 
+     * Assume roots is built correctly as in kruskals.
+     * 
+     * @param roots the root array
+     * @param index the initial node whose root we want
+     * @return the final root
+     */
+    private int findRoot(int[] roots, int index) {
+        int finalR = roots[index];
+        while(roots[finalR] != finalR){
+            //a root should point to itself
+            //if it doesn't, then keep going until it does
+            finalR = roots[finalR];
+        }
+        return finalR;
     }
     
     public static void main (String[] args){
@@ -260,7 +299,10 @@ public class WGraphP4<VT> implements WGraph<VT> {
         g.addVertex(v);
         g.addVertex(u);
         g.addVertex(x);
+        int[] a = new int[4];
+        System.out.println(a[1]);
+        //new WEdge<Character>(a, c, 1);
         System.out.println(g.allVertices().get(1).id());
-        g.kruskals();
+        //g.kruskals();
     }
 }

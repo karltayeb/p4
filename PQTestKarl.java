@@ -54,6 +54,21 @@ public class PQTestKarl {
         }
     }
 
+    @ Test
+    public void testParentIndex() {
+        for (int i = 1; i < 1000000; i++) {
+            assertTrue("",empty.getParentIndex(i*2) == empty.getParentIndex(i*2+1));
+        }
+
+        for (int i = 2; i < 10000000; i*=2) {
+            assertTrue("", empty.getParentIndex(i) == (i/2));
+        }
+    }
+
+    @Test
+    public void testChildIndex() {
+        return;
+    }
     /* Test size() on empty MaxPQ */
     @Test
     public void testSizeEmpty() {
@@ -110,6 +125,7 @@ public class PQTestKarl {
     /* Test clear() on non-empty MaxPQ */
     @Test
     public void testClearNonEmpty() {
+
     	smalltolarge.clear();
     	assertTrue("Size not updated correctly on clear()", smalltolarge.size() == 0);
 		assertTrue("MaxPQ is not empty after clear()", smalltolarge.isEmpty());
@@ -155,7 +171,7 @@ public class PQTestKarl {
     	assertTrue("Max element is incorrect for heap built from large to small values",
     					largetosmall.peek() == (Integer) 99);
     	assertTrue("Max element is incorrect for heap built with all identical values",
-    					allsame.peek() == (Integer) 99);
+    					allsame.peek() == (Integer) 1);
     	assertTrue("Max element is incorrect for heap built with largest value put in first",
     					randomgen.peek() == (Integer) 99);
     	// Insert another value on random to check largest-inserted-last condition
@@ -199,8 +215,9 @@ public class PQTestKarl {
     	assertTrue("Remove Max didn't return correct value.", removed == (99));
 		assertTrue("Remove Max didn't update size.", smalltolarge.size() == (99));
     	while(!smalltolarge.isEmpty()) {
-    		removed--;
-    		assertTrue("Remove Max didn't return correct value.", smalltolarge.peek() == (removed));
+            removed--;
+    		assertTrue("Remove Max didn't return correct value. Got " + smalltolarge.peek() + " expected " +
+                removed, smalltolarge.peek() == (removed));
             smalltolarge.remove();
     		assertTrue("Remove Max didn't update size.", smalltolarge.size() == (removed));
     	}
@@ -220,7 +237,7 @@ public class PQTestKarl {
     	while(!largetosmall.isEmpty()) {
     		removed--;
     		assertTrue("Remove Max didn't return correct value.", largetosmall.peek() == (removed));
-            smalltolarge.remove();
+            largetosmall.remove();
     		assertTrue("Remove Max didn't update size.", largetosmall.size() == (removed));
     	}
     }
@@ -232,7 +249,7 @@ public class PQTestKarl {
     		size--;
     		assertTrue("Remove Max didn't return correct value.", allsame.peek() == (1));
             allsame.remove();
-    		assertTrue("Remove Max didn't update size.", largetosmall.size() == (size));
+    		assertTrue("Remove Max didn't update size.", allsame.size() == (size));
     	}
     }
 
@@ -243,7 +260,7 @@ public class PQTestKarl {
         assertFalse("Previously empty is still empty after insert", 
                 empty.isEmpty());
         assertEquals("Size does not update with insert of empty size", 
-                0, empty.size());
+                1, empty.size());
         try {
             assertTrue("MaxVal not updated after insert on empty list",
                 empty.peek() == 1);
@@ -312,49 +329,49 @@ public class PQTestKarl {
         	random = (Integer)(int)(Math.random() * 50 + 1);
         	randomgen.insert((Integer) random);
 
-    		assertTrue("Size not updated when inserting duplicates", allsame.size() == (100 + i));
-    		assertTrue("MaxVal changed when inserting submaximal duplicate value", allsame.peek() == 99);
+    		assertTrue("Size not updated when inserting duplicates", randomgen.size() == (100 + i));
+    		assertTrue("MaxVal changed when inserting submaximal duplicate value", randomgen.peek() == 99);
         }
     }
 
     @Test
     public void testInit() {
         List<Integer> list = new LinkedList();
-        List<Integer> order = new LinkedList();
+        List<Integer> bigSmall = new LinkedList();
         List<Integer> smallBig = new LinkedList();
         List<Integer> same = new LinkedList();
 
-        for (int i = 1; i <= 10; i++) {
-            order.add(10 - i);
+        for (int i = 0; i < 10; i++) {
+            bigSmall.add(9-i);
             smallBig.add(i);
             same.add(1);
         }
 
-        list.add(6); list.add(3); list.add(9); list.add(2); list.add(3); list.add(8); list.add(5); list.add(2); list.add(9); list.add(1); list.add(10);
+        list.add(6); list.add(3); list.add(9); list.add(2); list.add(3); list.add(8); list.add(5); list.add(2); list.add(9); list.add(10);
 
+        // initialize PQs with arraylists
         empty.init(list);
         smalltolarge.init(smallBig);
-        largetosmall.init(order);
+        largetosmall.init(bigSmall);
         allsame.init(same);
 
         assertTrue("Empty queue is still empty after init()", !empty.isEmpty());
-        assertTrue("Size of queue does not match size of Collection in init()", empty.size() == 11);
-        assertTrue("MaxVal is incorrect after init to empty list", empty.peek() == 10);
+        assertTrue("Size of queue does not match size of Collection in init()", empty.size() == 10);
+        assertTrue("MaxVal is incorrect after init to empty list" + empty.peek(), empty.peek() == 10);
         assertTrue("Non-empty queue is empty after init()", !smalltolarge.isEmpty());
         assertTrue("Size of queue does not match size of Collection in init()", smalltolarge.size() == 10);
-        assertTrue("MaxVal is incorrect after init to non-empty list", smalltolarge.peek() == 10);
+        assertTrue("MaxVal is incorrect after init to non-empty list", smalltolarge.peek() == 9);
         assertTrue("Non-empty queue is empty after init()", !largetosmall.isEmpty());
         assertTrue("Size of queue does not match size of Collection in init()", largetosmall.size() == 10);
-        assertTrue("MaxVal is incorrect after init to non-empty list", largetosmall.peek() == 10);
+        assertTrue("MaxVal is incorrect after init to non-empty list" + largetosmall.peek(), largetosmall.peek() == 9);
         assertTrue("Non-empty queue is empty after init()", !allsame.isEmpty());
         assertTrue("Size of queue does not match size of Collection in init()", allsame.size() == 10);
         assertTrue("MaxVal is incorrect after init to non-empty list", allsame.peek() == 1);
-
-        for (int i = 0; i < 11; i++) {
-            assertEquals("Empty queue's init with random ordered values does not match up with expected values", order.get(i), empty.peek());
-            assertEquals("Queue with increasing values' init does not match up with expected values", order.get(i), smalltolarge.peek());
-            assertEquals("Queue with decreasing values' init does not match up with expected values", order.get(i), largetosmall.peek());
-            assertEquals("Queue with same values' init does not match up with expected values", order.get(i), allsame.peek());
+    
+        for (int i = 0; i < 10; i++) {
+            assertEquals("Queue with increasing values' init does not match up with expected values", smallBig.get(9 - i), smalltolarge.peek());
+            assertEquals("Queue with decreasing values' init does not match up with expected values", bigSmall.get(i), largetosmall.peek());
+            assertEquals("Queue with same values' init does not match up with expected values", same.get(i), allsame.peek());
 
             empty.remove();
             smalltolarge.remove();
