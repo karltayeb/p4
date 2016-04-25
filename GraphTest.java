@@ -169,15 +169,19 @@ public class GraphTest {
         g.addEdge(aq);
         assertEquals("[(4, 6, 1.0), (4, 7, 2.0)]", g.allEdges().toString());        
         g.addEdge(qb);
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (7, 5, 3.0)]", g.allEdges().toString());
+        /* NOTE:
+         * AllEdges returns edges such that source.id() < end.id()
+         * aka: WEdge(source, end, weight) where source < end 
+         */
+        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 7, 3.0)]", g.allEdges().toString());
         g.addEdge(bw);
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (7, 5, 3.0), (5, 8, 4.0)]", g.allEdges().toString());
+        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 7, 3.0), (5, 8, 4.0)]", g.allEdges().toString());
         g.addEdge(wr);
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (7, 5, 3.0), (5, 8, 4.0), (8, 9, 5.0)]", g.allEdges().toString());
+        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 7, 3.0), (5, 8, 4.0), (8, 9, 5.0)]", g.allEdges().toString());
         g.addEdge(br);
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (7, 5, 3.0), (5, 8, 4.0), (5, 9, 6.0), (8, 9, 5.0)]", g.allEdges().toString());
+        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 7, 3.0), (5, 8, 4.0), (5, 9, 6.0), (8, 9, 5.0)]", g.allEdges().toString());
         assertFalse(g.addEdge(bw));
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (7, 5, 3.0), (5, 8, 4.0), (5, 9, 6.0), (8, 9, 5.0)]", g.allEdges().toString());
+        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 7, 3.0), (5, 8, 4.0), (5, 9, 6.0), (8, 9, 5.0)]", g.allEdges().toString());
         assertTrue(g.deleteEdge(q, b));
         assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 8, 4.0), (5, 9, 6.0), (8, 9, 5.0)]", g.allEdges().toString());
         assertTrue(g.deleteEdge(w, r));
@@ -199,12 +203,12 @@ public class GraphTest {
     @Test
     public void testKruskals() {
         /** Use these vertices
-        1. v = new GVertex<Character>('v', g.nextID());
-        2. u = new GVertex<Character>('u', g.nextID());
-        3. x = new GVertex<Character>('x', g.nextID());
-        4. y = new GVertex<Character>('y', g.nextID());
-        5. a = new GVertex<Character>('a', g.nextID());
-        6. b = new GVertex<Character>('b', g.nextID());
+        0. v = new GVertex<Character>('v', g.nextID());
+        1. u = new GVertex<Character>('u', g.nextID());
+        2. x = new GVertex<Character>('x', g.nextID());
+        3. y = new GVertex<Character>('y', g.nextID());
+        4. a = new GVertex<Character>('a', g.nextID());
+        5. b = new GVertex<Character>('b', g.nextID());
         */
 
         WEdge<Character> xu = new WEdge<Character>(x, u, 5);
@@ -213,6 +217,9 @@ public class GraphTest {
         WEdge<Character> yb = new WEdge<Character>(y, b, 2);
         WEdge<Character> ab = new WEdge<Character>(a, b, 1);
         WEdge<Character> bu = new WEdge<Character>(b, u, 6);
+        WEdge<Character> vx = new WEdge<Character>(v, x, 7);
+        WEdge<Character> va = new WEdge<Character>(v, a, 9);
+        
 
         g.addEdge(xu);
         g.addEdge(xy);
@@ -220,9 +227,15 @@ public class GraphTest {
         g.addEdge(yb);
         g.addEdge(ab);
         g.addEdge(bu);
+        g.addEdge(vx);
+        g.addEdge(va);
         
         List<WEdge<Character>> mst = g.kruskals();
+        assertTrue(mst.contains(xy));
         assertTrue(mst.contains(ab));
+        assertTrue(mst.contains(yb));
+        assertTrue(mst.contains(xu));
+        assertTrue(mst.contains(vx));
     }
  
 

@@ -47,7 +47,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     @Override
     public boolean addVertex(Object data) {
-        int properIndex = this.nextID();
+        int properIndex = this.nextID;
         this.verts.add(new GVertex(data, this.nextID++));
         // add adjacency list for this vertex, index should corresponds with vertex ID
         // ensures that adjlist's size is the same as the index of the vertice
@@ -101,7 +101,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
         boolean edgeExists = this.areAdjacent(v, u);
         if (!edgeExists) {
             this.adjlist.get(v.id()).add(new WEdge<VT>(v, u, w));
-            this.adjlist.get(u.id()).add(new WEdge<VT>(v, u, w));
+            this.adjlist.get(u.id()).add(new WEdge<VT>(u, v, w));
             this.numEdges++;
             return true;
         }
@@ -170,8 +170,11 @@ public class WGraphP4<VT> implements WGraph<VT> {
     }
 
     @Override
+    /* Note: allEdges() returns edges such that source.id() < end.id();
+     * (non-Javadoc)
+     * @see WGraph#allEdges()
+     */
     public List<WEdge<VT>> allEdges() {
-        // This is super inefficient right now
         int nv = this.numVerts();
         ArrayList<WEdge<VT>> edges = new ArrayList<WEdge<VT>>(nv);
         for (ArrayList<WEdge<VT>> edgelist : this.adjlist) {
@@ -217,7 +220,6 @@ public class WGraphP4<VT> implements WGraph<VT> {
         
     }
 
-
     //TODO
     /** Return a list of all the edges incident on vertex v.  
      *  @param v the starting vertex
@@ -227,52 +229,45 @@ public class WGraphP4<VT> implements WGraph<VT> {
     public List<WEdge<VT>> incidentEdges(GVertex<VT> v) {
         return null;
     }
-
-    //TODO
-    /** Return a list of edges in a minimum spanning forest by
-     *  implementing Kruskal's algorithm using fast union/finds.
-     *  @return a list of the edges in the minimum spanning forest
-     */
-    @Override
-    public List<WEdge<VT>> kruskals() {
-        List<WEdge<VT>> edges = this.allEdges();
-        //roots is the array that holds the roots of each node (Gvertex);
-        int[] roots = new int[this.allVertices().size()];
-        for (int i = 0; i< roots.length; i++){
-            roots[i] = i;
-        }
-        //each node is its own root initially
-                
-        //heap contains all the edges of the graph
-        PQHeap<WEdge<VT>> heap = new PQHeap<WEdge<VT>>(new ReverseComparator());
-        for (int i = 0; i < edges.size(); i++) {
-            //add all edges into min-heap
-            heap.insert(edges.remove(0));
-        }
-        
-        List<WEdge<VT>> MST = new ArrayList<WEdge<VT>>();
-        WEdge<VT> temp;
-        int sourceID, endID;
-        //Use removemin() to process edges correctly
-        for (int i = 0; i< heap.size(); i++) {
-            temp = heap.peek(); //finds the min Edge
-            sourceID = temp.source().id();
-            endID = temp.end().id();
-            if (findRoot(roots, sourceID) != findRoot(roots, endID)) {  
-                //Union Nodes if different roots  
-                roots[endID] = sourceID;
-                //if different roots, then edge is part of MST
-                MST.add(temp);
-            }
-            heap.remove();  //removes the proccessed min Edge
-        }
-        
-        return MST;
-    }
     
-    /** For the min-heap.
-     * 
-     * @author Richard
+     //TODO
+     /** Return a list of edges in a minimum spanning forest by
+      *  implementing Kruskal's algorithm using fast union/finds.
+      *  @return a list of the edges in the minimum spanning forest
+      */
+     @Override
+     public List<WEdge<VT>> kruskals() {
+         Partition roots = new Partition(this.allVertices().size());
+         List<WEdge<VT>> MST = new ArrayList<WEdge<VT>>();
+         List<WEdge<VT>> edges = this.allEdges();
+
+         //heap contains all the edges of the graph
+         PQHeap<WEdge<VT>> heap = new PQHeap<WEdge<VT>>(new ReverseComparator());
+         for (int i = 0; i < edges.size(); i++) {
+             //add all edges into min-heap
+             heap.insert(edges.get(i));
+         }
+      
+         // process all the edges IN ORDER OF WEIGHT    
+         while (!heap.isEmpty()) {
+             WEdge<VT> current = heap.peek();
+             int root1 = roots.find(current.source().id());   
+             int root2 = roots.find(current.end().id());     
+             
+             //if the two roots are NOT equal, then union and add to MST
+             //otherwise, do nothing
+             if(root1 != root2){
+                 MST.add(current);
+                 roots.union(root1, root2);
+             }
+             //remove the processed edge
+             heap.remove();
+         }
+         
+         return MST;
+     }
+     
+    /** A comparator to make PQHeap a min-heap.
      *
      * @param <T>
      */
@@ -280,24 +275,6 @@ public class WGraphP4<VT> implements WGraph<VT> {
         public int compare(T t1, T t2) {
             return t2.compareTo(t1);
         }
-    }
-    
-    /** A small private method for tracing through an array to find 
-     * the root of a node.  Specifically for use in the kruskals() method. 
-     * Assume roots is built correctly as in kruskals.
-     * 
-     * @param roots the root array
-     * @param index the initial node whose root we want
-     * @return the final root
-     */
-    private int findRoot(int[] roots, int index) {
-        int finalR = roots[index];
-        while(roots[finalR] != finalR){
-            //a root should point to itself
-            //if it doesn't, then keep going until it does
-            finalR = roots[finalR];
-        }
-        return finalR;
     }
     
     public static void main (String[] args){
