@@ -194,10 +194,9 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     //TODO
     public List<GVertex<VT>> depthFirst(GVertex<VT> v) {
-        boolean bool = true;
         List<GVertex<VT>> vlist = new ArrayList<GVertex<VT>>();
-        Stack slist = new Stack();
-        Set<GVertex<VT>> visited = new HashSet();
+        Stack<GVertex<VT>> slist = new Stack<GVertex<VT>>();
+        Set<GVertex<VT>> visited = new HashSet<GVertex<VT>>();
         slist.push(v);
        
         while(!slist.empty()){
@@ -214,7 +213,6 @@ public class WGraphP4<VT> implements WGraph<VT> {
                     }
                 }
             }
-
         }
         return vlist;
         
