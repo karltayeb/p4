@@ -16,7 +16,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
     public ArrayList<ArrayList<WEdge<VT>>> adjlist;
     private int numEdges;
 
-    public WGraphP4(int maxVerts) {
+    public WGraphP4() {
         this.nextID = 0;
         this.numEdges = 0;
         this.verts = new ArrayList<GVertex<VT>>();
@@ -47,7 +47,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     @Override
     public boolean addVertex(Object data) {
-        int properIndex = this.nextID();
+        int properIndex = this.nextID;
         this.verts.add(new GVertex(data, this.nextID++));
         // add adjacency list for this vertex, index should corresponds with vertex ID
         // ensures that adjlist's size is the same as the index of the vertice
@@ -101,7 +101,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
         boolean edgeExists = this.areAdjacent(v, u);
         if (!edgeExists) {
             this.adjlist.get(v.id()).add(new WEdge<VT>(v, u, w));
-            this.adjlist.get(u.id()).add(new WEdge<VT>(v, u, w));
+            this.adjlist.get(u.id()).add(new WEdge<VT>(u, v, w));
             this.numEdges++;
             return true;
         }
@@ -225,6 +225,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
      */
     @Override
     public List<WEdge<VT>> incidentEdges(GVertex<VT> v) {
+        //return this.adjlist(v.id());
         return null;
     }
 
@@ -299,9 +300,9 @@ public class WGraphP4<VT> implements WGraph<VT> {
         }
         return finalR;
     }
-    
+
     public static void main (String[] args){
-        WGraphP4<Character> g = new WGraphP4<Character>(100);
+        WGraphP4<Character> g = new WGraphP4<Character>();
         GVertex<Character> v = new GVertex<Character>('v', g.nextID());
         GVertex<Character> u = new GVertex<Character>('u', g.nextID());
         GVertex<Character> x = new GVertex<Character>('x', g.nextID());
