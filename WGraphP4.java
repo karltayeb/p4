@@ -13,7 +13,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     /** the vertices */
     private ArrayList<GVertex<VT>> verts;
-    private ArrayList<ArrayList<WEdge<VT>>> adjlist;
+    public ArrayList<ArrayList<WEdge<VT>>> adjlist;
     private int numEdges;
 
     public WGraphP4(int maxVerts) {
@@ -47,9 +47,13 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     @Override
     public boolean addVertex(Object data) {
+        int properIndex = this.nextID();
         this.verts.add(new GVertex(data, this.nextID++));
-        // add adjacency list for this vertex, inex should corresponds with vertex ID
-        this.adjlist.add(new ArrayList<WEdge<VT>>());
+        // add adjacency list for this vertex, index should corresponds with vertex ID
+        // ensures that adjlist's size is the same as the index of the vertice
+        for (int i = this.adjlist.size(); i < properIndex + 1; i++ ){
+            this.adjlist.add(new ArrayList<WEdge<VT>>());
+        }
         return true;
     }
 
@@ -59,9 +63,14 @@ public class WGraphP4<VT> implements WGraph<VT> {
         if (this.verts.contains(v)) {
             return false;  // there 
         }
+        int properIndex = v.id();
         this.verts.add(v);
-        // add adjacency list for this vertex, inex should corresponds with vertex ID
-        this.adjlist.add(new ArrayList<WEdge<VT>>());
+        // add adjacency list for this vertex, index should corresponds with vertex ID
+        // ensures that adjlist's .size is the same as the 
+        for (int i = this.adjlist.size(); i < properIndex + 1; i++ ){
+            this.adjlist.add(new ArrayList<WEdge<VT>>());
+        }
+        
         return true;
     }
     
