@@ -2,11 +2,15 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+
+import WGraphP4.ReverseComparator;
+
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 
 public class P4C {
@@ -110,14 +114,90 @@ public class P4C {
 
 	}
 
+	//TODO
     /** Return a list of edges in a minimum spanning forest by
      *  implementing Kruskal's algorithm using fast union/finds.
+     *  @return a list of the edges in the minimum spanning forest
+     */
+    @Override
+    public List<WEdge<VT>> kruskals() {
+        Partition roots = new Partition(this.allVertices().size());
+        List<WEdge<VT>> MST = new ArrayList<WEdge<VT>>();
+        List<WEdge<VT>> edges = this.allEdges();
+
+        //heap contains all the edges of the graph
+        PQHeap<WEdge<VT>> heap = new PQHeap<WEdge<VT>>(new ReverseComparator());
+        for (int i = 0; i < edges.size(); i++) {
+            //add all edges into min-heap
+            heap.insert(edges.get(i));
+        }
+     
+        // process all the edges IN ORDER OF WEIGHT    
+        while (!heap.isEmpty()) {
+            WEdge<VT> current = heap.peek();
+            int root1 = roots.find(current.source().id());   
+            int root2 = roots.find(current.end().id());     
+            
+            //if the two roots are NOT equal, then union and add to MST
+            //otherwise, do nothing
+            if(root1 != root2){
+                MST.add(current);
+                roots.union(root1, root2);
+            }
+            //remove the processed edge
+            heap.remove();
+        }
+        
+        return MST;
+    }
+    
+   /** A comparator to make PQHeap a min-heap.
+    *
+    * @param <T>
+    */
+   private static class ReverseComparator<T extends Comparable<T>> implements Comparator<T> {
+       public int compare(T t1, T t2) {
+           return t2.compareTo(t1);
+       }
+   }
+   
+    /** Return a list of edges in a minimum spanning forest by
+     *  implementing Kruskal's algorithm using fast union/finds.
+     *  Aka modified Kruskals.
      *  @param g the graph to segment
      *  @param kvalue the value to use for k in the merge test
      *  @return a list of the edges in the minimum spanning forest
      */
 
-    static List<WEdge<Pixel>> segmenter(WGraph<Pixel> g, double kvalue) {
+    public static List<WEdge<Pixel>> segmenter(WGraph<Pixel> g, double kvalue) {
+        Partition roots = new Partition(g.allVertices().size());
+        List<WEdge<Pixel>> MST = new ArrayList<WEdge<Pixel>>();
+        List<WEdge<Pixel>> edges = g.allEdges();
+
+        //heap contains all the edges of the graph
+        PQHeap<WEdge<Pixel>> heap = new PQHeap<WEdge<Pixel>>(new ReverseComparator<WEdge<Pixel>>());
+        for (int i = 0; i < edges.size(); i++) {
+            //add all edges into min-heap
+            heap.insert(edges.get(i));
+        }
+     
+        // process all the edges IN ORDER OF WEIGHT    
+        while (!heap.isEmpty()) {
+            WEdge<VT> current = heap.peek();
+            int root1 = roots.find(current.source().id());   
+            int root2 = roots.find(current.end().id());     
+            
+            //if the two roots are NOT equal, then union and add to MST
+            //otherwise, do nothing
+            if(root1 != root2){
+                MST.add(current);
+                roots.union(root1, root2);
+            }
+            //remove the processed edge
+            heap.remove();
+        }
+        
+        return MST;
     	return null;
     }
 
@@ -130,6 +210,10 @@ public class P4C {
     	public PixelDistance() {
     	}
 
+    	/* Gives the (distance)^2.
+    	 * (non-Javadoc)
+    	 * @see Distance#distance(java.lang.Object, java.lang.Object)
+    	 */    	
     	public double distance(Pixel one, Pixel two) {
 			int b11 = one.value() & 0xFF;
 			int b12 = (one.value() >> 8) & 0xFF;

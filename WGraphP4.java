@@ -1,7 +1,6 @@
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Set;
 import java.util.HashSet;
@@ -274,24 +273,6 @@ public class WGraphP4<VT> implements WGraph<VT> {
         public int compare(T t1, T t2) {
             return t2.compareTo(t1);
         }
-    }
-    
-    /** A small private method for tracing through an array to find 
-     * the root of a node.  Specifically for use in the kruskals() method. 
-     * Assume roots is built correctly as in kruskals.
-     * 
-     * @param roots the root array
-     * @param index the initial node whose root we want
-     * @return the final root
-     */
-    private int findRoot(int[] roots, int index) {
-        int finalR = roots[index];
-        while(roots[finalR] != finalR){
-            //a root should point to itself
-            //if it doesn't, then keep going until it does
-            finalR = roots[finalR];
-        }
-        return finalR;
     }
 
     public static void main (String[] args){
