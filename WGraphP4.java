@@ -1,7 +1,6 @@
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.Stack;
 import java.util.Set;
 import java.util.HashSet;
@@ -275,37 +274,29 @@ public class WGraphP4<VT> implements WGraph<VT> {
             return t2.compareTo(t1);
         }
     }
-    
-    /** A small private method for tracing through an array to find 
-     * the root of a node.  Specifically for use in the kruskals() method. 
-     * Assume roots is built correctly as in kruskals.
-     * 
-     * @param roots the root array
-     * @param index the initial node whose root we want
-     * @return the final root
-     */
-    private int findRoot(int[] roots, int index) {
-        int finalR = roots[index];
-        while(roots[finalR] != finalR){
-            //a root should point to itself
-            //if it doesn't, then keep going until it does
-            finalR = roots[finalR];
-        }
-        return finalR;
-    }
 
     public static void main (String[] args){
         WGraphP4<Character> g = new WGraphP4<Character>();
         GVertex<Character> v = new GVertex<Character>('v', g.nextID());
         GVertex<Character> u = new GVertex<Character>('u', g.nextID());
         GVertex<Character> x = new GVertex<Character>('x', g.nextID());
+        WEdge e = new WEdge<Character>(u, v, 1);
+        WEdge e2 = new WEdge<Character>(v, x, 2);
         g.addVertex(v);
         g.addVertex(u);
         g.addVertex(x);
-        int[] a = new int[4];
-        System.out.println(a[1]);
-        //new WEdge<Character>(a, c, 1);
-        System.out.println(g.allVertices().get(1).id());
-        //g.kruskals();
-    }
+        g.addEdge(e);
+        g.addEdge(e2);
+
+
+        
+        List dfirst = g.depthFirst(u);
+
+        for (int i = 0; i < dfirst.size(); i++) {
+ 
+            System.out.println(i + ". " + dfirst.get(i));
+
+        }
+
+   }
 }
