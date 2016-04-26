@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 public class P4C {
 
-
     /** Convert an image to a graph of Pixels with edges between
      *  north, south, east and west neighboring pixels.
      *  @param image the image to convert
@@ -57,7 +56,6 @@ public class P4C {
 	private static int index (int i, int j, int width) {
 		return (j * width) + i;
 	}
-
 
 	/**
 	 * Helper method that creates the edges in a new image
@@ -165,28 +163,53 @@ public class P4C {
             System.out.print("NSegments =  "
                              + (g.numVerts() - res.size()) + "\n");
 
-            // make a background image to put a segment into
-            for (int i = 0; i < image.getHeight(); i++) {
-                for (int j = 0; j < image.getWidth(); j++) {
-                    image.setRGB(j, i, gray);
-                }
+            // Remove all edges not in the minimal spanning forrest
+            for (WEdge<Pixel> edge : g.allEdges()) {
+            	if (!res.contains(edge)) {
+            		g.deleteEdge(edge.source(), edge.end());
+            	}
             }
 
-            /**
-            // After you have a spanning tree connected component x, 
-            // you can generate an output image like this:
-            for (GVertex<Pixel> i: x)  {
-                Pixel d = i.data();
-                image.setRGB(d.col(), d.row(), d.value());
+            // We need to account for every vertex
+            List<GVertex<Pixel>> vertices = g.allVertices();
+
+            // Since the graph is now a minimally spanning forest doing
+            // a depth first search on one vertex will uncover all vertices
+            // in a given segment.
+            List<GVertex<Pixel>> visited = new ArrayList<GVertex<Pixel>>();
+            int numSegments = 0;
+            
+            for (GVertex<Pixel> vertex : vertices) {
+            	if (visited.contains(vertex)) {
+            		// we already added the sub graph this vertex belongs to
+            		continue;
+            	}
+
+            	List<GVertex<Pixel>> segment = g.depthFirst(vertex);
+            	visited.addAll(segment);
+            	numSegments++;
+
+	            // make a background image to put a segment into
+	            for (int i = 0; i < image.getHeight(); i++) {
+	                for (int j = 0; j < image.getWidth(); j++) {
+	                    image.setRGB(j, i, gray);
+	                }
+	            }
+
+	            // put the segment in the image
+	            for (GVertex<Pixel> i: segment)  {
+	                Pixel d = i.data();
+	                image.setRGB(d.col(), d.row(), d.value());
+	            }
+
+	            // save file
+	            String savename = "output" + numSegments + ".png";
+	            File f = new File(savename);
+	            ImageIO.write(image, "png", f);            	
+
             }
 
-            File f = new File("output.png");
-            ImageIO.write(image, "png", f);
 
-            // You'll need to do that for each connected component,
-            // writing each one to a different file, clearing the
-            // image buffer first
-			*/
         } catch (IOException e) {
             System.out.print("Missing File!\n");
 
