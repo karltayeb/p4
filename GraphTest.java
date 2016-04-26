@@ -16,7 +16,7 @@ public class GraphTest {
 
     @Before
     public void setupGraph() {
-        g = new WGraphP4(100);
+        g = new WGraphP4();
         v = new GVertex<Character>('v', g.nextID());
         u = new GVertex<Character>('u', g.nextID());
         x = new GVertex<Character>('x', g.nextID());
@@ -237,6 +237,41 @@ public class GraphTest {
         assertTrue(mst.contains(xu));
         assertTrue(mst.contains(vx));
     }
+
+    @Test
+    public void testDepthFirst() {
+    
+        g.addVertex(c);
+        g.addVertex(a);
+        g.addVertex(q);
+        g.addVertex(b);
+        g.addVertex(w);
+        g.addVertex(r);
+        g.addVertex(b);
+        g.addEdge(ac);
+        g.addEdge(aq);
+        g.addEdge(qb);
+        g.addEdge(bw);
+        g.addEdge(wr);
+        //g.addEdge(br);
+
+        List dfirst = g.depthFirst(c);
+
+   
+        assertEquals(c.id(), dfirst.get(0));
+        assertEquals(c.id(), dfirst.get(1));
+        assertEquals(c.id(), dfirst.get(2));
+        assertEquals(c.id(), dfirst.get(3));
+        assertEquals(c.id(), dfirst.get(4));
+        assertEquals(c.id(), dfirst.get(5));
+
+ 
+
+
+    }
+
+
+
  
 
 
