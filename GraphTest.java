@@ -12,7 +12,7 @@ import static org.junit.Assert.assertFalse;
 public class GraphTest {
     WGraphP4<Character> g;
     GVertex<Character> v, u, x, y, a, b, c, q, w, r;
-    WEdge<Character> ac, aq, qb, bw, wr, br, wq, cw, e, f;
+    WEdge<Character> ac, aq, qb, bw, wr, br, wq, cw, rc, e, f;
 
     @Before
     public void setupGraph() {
@@ -37,7 +37,7 @@ public class GraphTest {
         br = new WEdge<Character>(b, r, 6);
         wq = new WEdge<Character>(w, q, 7);
         cw = new WEdge<Character>(c, w, 8);
-
+        rc = new WEdge<Character>(r, c, 9);
 
         e = new WEdge<Character>(v, u, 1);
         f = new WEdge<Character>(v, x, 2);
@@ -259,10 +259,20 @@ public class GraphTest {
         g.addEdge(qb);
         g.addEdge(bw);
         g.addEdge(wr);
-        //g.addEdge(br);
 
+
+        g.addEdge(rc);
         dfirst = g.depthFirst(c);
+        assertEquals(6, dfirst.size());   
+        assertEquals(c, dfirst.get(0));
+        assertEquals(r, dfirst.get(1));
+        assertEquals(w, dfirst.get(2));
+        assertEquals(b, dfirst.get(3));
+        assertEquals(q, dfirst.get(4));
+        assertEquals(a, dfirst.get(5));
 
+        g.deleteEdge(r, c);
+        dfirst = g.depthFirst(c);
         assertEquals(6, dfirst.size());   
         assertEquals(c, dfirst.get(0));
         assertEquals(a, dfirst.get(1));
@@ -291,8 +301,6 @@ public class GraphTest {
         assertEquals(b, dfirst.get(3));
         assertEquals(a, dfirst.get(4));
         assertEquals(r, dfirst.get(5));
-
-
  
 
 
