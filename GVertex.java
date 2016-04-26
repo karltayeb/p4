@@ -26,6 +26,13 @@ public class GVertex<T> implements Comparable<GVertex<T>> {
         return this.num;
     }
 
+    /** Get the data stored in theis vertex
+     *  @return the data
+     */
+    public T data() {
+        return this.data;
+    }
+
     public void setID(int id) {
         this.num = id;
     }
