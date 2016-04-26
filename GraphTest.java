@@ -12,7 +12,7 @@ import static org.junit.Assert.assertFalse;
 public class GraphTest {
     WGraphP4<Character> g;
     GVertex<Character> v, u, x, y, a, b, c, q, w, r;
-    WEdge<Character> ac, aq, qb, bw, wr, br, e, f;
+    WEdge<Character> ac, aq, qb, bw, wr, br, wq, cw, rc, e, f;
 
     @Before
     public void setupGraph() {
@@ -35,8 +35,9 @@ public class GraphTest {
         bw = new WEdge<Character>(b, w, 4);
         wr = new WEdge<Character>(w, r, 5);
         br = new WEdge<Character>(b, r, 6);
-
-
+        wq = new WEdge<Character>(w, q, 7);
+        cw = new WEdge<Character>(c, w, 8);
+        rc = new WEdge<Character>(r, c, 9);
 
         e = new WEdge<Character>(v, u, 1);
         f = new WEdge<Character>(v, x, 2);
@@ -237,6 +238,76 @@ public class GraphTest {
         assertTrue(mst.contains(xu));
         assertTrue(mst.contains(vx));
     }
+
+    @Test
+    public void testDepthFirst() {
+    
+        g.addVertex(c);
+        List dfirst = g.depthFirst(c);
+        assertEquals(1, dfirst.size());
+        assertEquals(c, dfirst.get(0));
+
+        g.addVertex(a);
+        g.addVertex(q);
+        g.addVertex(b);
+        g.addVertex(w);
+        g.addVertex(r);
+        g.addVertex(v);
+
+        g.addEdge(ac);
+        g.addEdge(aq);
+        g.addEdge(qb);
+        g.addEdge(bw);
+        g.addEdge(wr);
+
+
+        g.addEdge(rc);
+        dfirst = g.depthFirst(c);
+        assertEquals(6, dfirst.size());   
+        assertEquals(c, dfirst.get(0));
+        assertEquals(r, dfirst.get(1));
+        assertEquals(w, dfirst.get(2));
+        assertEquals(b, dfirst.get(3));
+        assertEquals(q, dfirst.get(4));
+        assertEquals(a, dfirst.get(5));
+
+        g.deleteEdge(r, c);
+        dfirst = g.depthFirst(c);
+        assertEquals(6, dfirst.size());   
+        assertEquals(c, dfirst.get(0));
+        assertEquals(a, dfirst.get(1));
+        assertEquals(q, dfirst.get(2));
+        assertEquals(b, dfirst.get(3));
+        assertEquals(w, dfirst.get(4));
+        assertEquals(r, dfirst.get(5));
+
+        g.addEdge(wq);
+        dfirst = g.depthFirst(c);
+
+        assertEquals(6, dfirst.size());   
+        assertEquals(c, dfirst.get(0));
+        assertEquals(a, dfirst.get(1));
+        assertEquals(q, dfirst.get(2));
+        assertEquals(w, dfirst.get(3));
+        assertEquals(r, dfirst.get(4));
+        assertEquals(b, dfirst.get(5));
+
+        g.addEdge(cw);
+        dfirst = g.depthFirst(c);
+        assertEquals(6, dfirst.size());   
+        assertEquals(c, dfirst.get(0));
+        assertEquals(w, dfirst.get(1));
+        assertEquals(q, dfirst.get(2));
+        assertEquals(b, dfirst.get(3));
+        assertEquals(a, dfirst.get(4));
+        assertEquals(r, dfirst.get(5));
+ 
+
+
+    }
+
+
+
  
 
 

@@ -280,13 +280,23 @@ public class WGraphP4<VT> implements WGraph<VT> {
         GVertex<Character> v = new GVertex<Character>('v', g.nextID());
         GVertex<Character> u = new GVertex<Character>('u', g.nextID());
         GVertex<Character> x = new GVertex<Character>('x', g.nextID());
+        WEdge e = new WEdge<Character>(u, v, 1);
+        WEdge e2 = new WEdge<Character>(v, x, 2);
         g.addVertex(v);
         g.addVertex(u);
         g.addVertex(x);
-        int[] a = new int[4];
-        System.out.println(a[1]);
-        //new WEdge<Character>(a, c, 1);
-        System.out.println(g.allVertices().get(1).id());
-        //g.kruskals();
-    }
+        g.addEdge(e);
+        g.addEdge(e2);
+
+
+        
+        List dfirst = g.depthFirst(u);
+
+        for (int i = 0; i < dfirst.size(); i++) {
+ 
+            System.out.println(i + ". " + dfirst.get(i));
+
+        }
+
+   }
 }
