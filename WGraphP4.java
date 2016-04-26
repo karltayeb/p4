@@ -226,8 +226,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
      */
     @Override
     public List<WEdge<VT>> incidentEdges(GVertex<VT> v) {
-        //return this.adjlist(v.id());
-        return null;
+        return this.adjlist.get(v.id());
     }
     
      //TODO

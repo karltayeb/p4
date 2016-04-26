@@ -24,8 +24,13 @@ public class Pixel {
 		return this.data & 0xFF;
 	}
 
-	public int data() {
+	public int row() {
+		return this.row;
+	}
+	public int col() {
+		return this.col;
+	}
+	public int value() {
 		return this.data;
 	}
-
 }
