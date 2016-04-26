@@ -44,6 +44,8 @@ public class P4C {
 				putEdges(imageGraph, verts, i, j, height, width, pd);
 			}
 		}
+
+		return imageGraph;
 	}
 
 	/**
