@@ -3,7 +3,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-import WGraphP4.ReverseComparator;
+//import WGraphP4.ReverseComparator;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -111,43 +111,6 @@ public class P4C {
 		}
 
 	}
-
-	//TODO
-    /** Return a list of edges in a minimum spanning forest by
-     *  implementing Kruskal's algorithm using fast union/finds.
-     *  @return a list of the edges in the minimum spanning forest
-     */
-    @Override
-    public List<WEdge<VT>> kruskals() {
-        Partition roots = new Partition(this.allVertices().size());
-        List<WEdge<VT>> MST = new ArrayList<WEdge<VT>>();
-        List<WEdge<VT>> edges = this.allEdges();
-
-        //heap contains all the edges of the graph
-        PQHeap<WEdge<VT>> heap = new PQHeap<WEdge<VT>>(new ReverseComparator());
-        for (int i = 0; i < edges.size(); i++) {
-            //add all edges into min-heap
-            heap.insert(edges.get(i));
-        }
-     
-        // process all the edges IN ORDER OF WEIGHT    
-        while (!heap.isEmpty()) {
-            WEdge<VT> current = heap.peek();
-            int root1 = roots.find(current.source().id());   
-            int root2 = roots.find(current.end().id());     
-            
-            //if the two roots are NOT equal, then union and add to MST
-            //otherwise, do nothing
-            if(root1 != root2){
-                MST.add(current);
-                roots.union(root1, root2);
-            }
-            //remove the processed edge
-            heap.remove();
-        }
-        
-        return MST;
-    }
     
    /** A comparator to make PQHeap a min-heap.
     *
@@ -181,7 +144,7 @@ public class P4C {
      
         // process all the edges IN ORDER OF WEIGHT    
         while (!heap.isEmpty()) {
-            WEdge<VT> current = heap.peek();
+            WEdge<Pixel> current = heap.peek();
             int root1 = roots.find(current.source().id());   
             int root2 = roots.find(current.end().id());     
             
@@ -196,7 +159,7 @@ public class P4C {
         }
         
         return MST;
-    	return null;
+    	//return null;
     }
 
     /** Internal PixelDistance class implements Distance interface
