@@ -43,6 +43,31 @@ public class Partition {
         }
     }
 
+    /** Weighted union of the sets containing two nodes, if different.
+     * 
+     *  @param a the first node
+     *  @param b the second node
+     *  @return the root node
+     *  Note: the Root node will always be NONNEGATIVE
+     *  
+     */
+    int union2(int a, int b) {
+        int root1 = find(a);     // Find root of node a
+        int root2 = find(b);     // Find root of node b
+        if (root1 != root2) {    // Merge with weighted union
+            if (this.weight[root2] > this.weight[root1]) {
+                this.parent[root1] = root2;
+                this.weight[root2] += this.weight[root1];
+                return root2;
+            } else {
+                this.parent[root2] = root1;
+                this.weight[root1] += this.weight[root2];
+                return root1;
+            }
+        }
+        return -1;
+    }
+    
     /** Find the (root of the) set containing a node, with path compression.
      *  @param curr the node to find
      *  @return the root node
