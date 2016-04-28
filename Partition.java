@@ -54,4 +54,8 @@ public class Partition {
         this.parent[curr] = this.find(this.parent[curr]);
         return this.parent[curr];
     }
+    
+    public int getSize(){
+        return this.size;
+    }
 }
