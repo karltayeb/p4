@@ -205,6 +205,7 @@ public class P4C {
      *  aka. the Set
      */
     private static int[] diff(ArrayList<Pixel> data) {
+
         int minR = data.get(0).r();
         int minG = data.get(0).g();
         int minB = data.get(0).b();
