@@ -15,7 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
 import java.io.IOException;
-
+import java.util.HashSet;
 
 public class P4C {
 
@@ -123,19 +123,21 @@ public class P4C {
      */
 
     public static List<WEdge<Pixel>> segmenter(WGraph<Pixel> g, double kvalue) {
+        System.out.println("in segmenter");
+
         Partition roots = new Partition(g.allVertices().size());
+        System.out.println("a");
         //ArrayList<ArrayList<WEdge<Pixel>>> MSTGroup = new ArrayList<ArrayList<WEdge<Pixel>>>();
         List<WEdge<Pixel>> MST = new ArrayList<WEdge<Pixel>>();
         List<WEdge<Pixel>> edges = g.allEdges();
+        System.out.println("b");
 
         //set up MSTGroup: to have n arrayLists, where 
         //heap contains all the edges of the graph
         PQHeap<WEdge<Pixel>> heap = new PQHeap<WEdge<Pixel>>(new ReverseComparator<WEdge<Pixel>>());
-        for (int i = 0; i < edges.size(); i++) {
-            //add all edges into min-heap
-            heap.insert(edges.get(i));
-        }
-        
+        System.out.println("getting edges");
+        heap.init(g.allEdges());
+        System.out.println("got edges");
         //SUPER IMPORTANT!!!!!!!!!!!!!!!!!!!
         //Map to contain all known min/maxes of a set: for O(1) access
         //int[] is length 7: contians minR, minG, minB, maxR, maxG, maxB, SetSize
@@ -348,19 +350,24 @@ public class P4C {
           // the line that reads the image file
 
             BufferedImage image = ImageIO.read(new File(args[0]));
-            WGraph<Pixel> g = imageToGraph(image, new PixelDistance());
+            WGraphP4<Pixel> g = (WGraphP4) imageToGraph(image, new PixelDistance());
+            System.out.println("Image loaded, now segmenting image...");
             List<WEdge<Pixel>> res = segmenter(g, Double.parseDouble(args[1]));
 
             System.out.print("result =  " + res.size() + "\n");
             System.out.print("NSegments =  "
                              + (g.numVerts() - res.size()) + "\n");
 
-            // Remove all edges not in the minimal spanning forrest
-            for (WEdge<Pixel> edge : g.allEdges()) {
-              if (!res.contains(edge)) {
-                g.deleteEdge(edge.source(), edge.end());
-              }
+            // Clear out the edges in g
+            // add back all the edges in res
+            // we found this faster than trying to find which ones to remove
+            g.clearEdges();
+
+            for (WEdge<Pixel> edge : res) {
+                g.addEdge(edge);
             }
+
+            System.out.println("c");
 
             // We need to account for every vertex
             List<GVertex<Pixel>> vertices = g.allVertices();
@@ -368,7 +375,7 @@ public class P4C {
             // Since the graph is now a minimally spanning forest doing
             // a depth first search on one vertex will uncover all vertices
             // in a given segment.
-            List<GVertex<Pixel>> visited = new ArrayList<GVertex<Pixel>>();
+            HashSet<GVertex<Pixel>> visited = new HashSet<GVertex<Pixel>>();
             int numSegments = 0;
             
             for (GVertex<Pixel> vertex : vertices) {
@@ -377,8 +384,11 @@ public class P4C {
                 continue;
               }
 
+              System.out.println("d");
               List<GVertex<Pixel>> segment = g.depthFirst(vertex);
+              System.out.println("e");
               visited.addAll(segment);
+              System.out.println("f");
               numSegments++;
 
               // make a background image to put a segment into

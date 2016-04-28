@@ -90,9 +90,9 @@ public class WGraphP4<VT> implements WGraph<VT> {
     @Override
     public boolean addEdge(GVertex<VT> v, GVertex<VT> u, double w) {
         boolean success = true;
-        if (!this.verts.contains(v))
+        if (this.adjlist.size() < v.id())
             success = this.addVertex(v);
-        if (success && !this.verts.contains(u))
+        if (success && (this.adjlist.size() < u.id()))
             success = this.addVertex(u);
         if (!success)
             return false;
@@ -176,14 +176,17 @@ public class WGraphP4<VT> implements WGraph<VT> {
      */
     public List<WEdge<VT>> allEdges() {
         int nv = this.numVerts();
-        ArrayList<WEdge<VT>> edges = new ArrayList<WEdge<VT>>(nv);
+        HashSet<WEdge<VT>> edgeSet = new HashSet<WEdge<VT>>(nv);
         for (ArrayList<WEdge<VT>> edgelist : this.adjlist) {
             for (WEdge<VT> entry : edgelist) {
-                if (!edges.contains(entry)){
-                    edges.add(entry);
+                if (!edgeSet.contains(entry)){
+                    edgeSet.add(entry);
                 }
             }
         }
+
+        ArrayList<WEdge<VT>> edges = new ArrayList<WEdge<VT>>();
+        edges.addAll(edgeSet);
         return edges;
     }
 
@@ -241,10 +244,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
          //heap contains all the edges of the graph
          PQHeap<WEdge<VT>> heap = new PQHeap<WEdge<VT>>(new ReverseComparator());
-         for (int i = 0; i < edges.size(); i++) {
-             //add all edges into min-heap
-             heap.insert(edges.get(i));
-         }
+         heap.init(this.allEdges());
       
          // process all the edges IN ORDER OF WEIGHT    
          while (!heap.isEmpty()) {
@@ -263,6 +263,13 @@ public class WGraphP4<VT> implements WGraph<VT> {
          }
          
          return MST;
+     }
+
+     /** This method removes all the edges in the graph. */
+     public void clearEdges() {
+        for (List<WEdge<VT>> list : this.adjlist) {
+            list.clear();
+        }
      }
      
     /** A comparator to make PQHeap a min-heap.
