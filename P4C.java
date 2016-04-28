@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
+import java.io.IOException;
 
 
 public class P4C {
@@ -53,7 +57,7 @@ public class P4C {
 	 * @param width the width of the image
 	 */
 	private static int index (int i, int j, int width) {
-		return (j * width) + i;
+		return (i * width) + j;
 	}
 
 
