@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
 import java.io.IOException;
+import java.util.LinkedList;
 
 
 public class P4C {
@@ -174,8 +175,8 @@ public class P4C {
      */
     private static boolean partialUnion(WGraph<Pixel> g, Partition p, int root1, int root2, double k){
         //A, B are Lists of the Pixels in each Disjoint Set
-        ArrayList<Pixel> A = new ArrayList<Pixel>();
-        ArrayList<Pixel> B = new ArrayList<Pixel>();
+        LinkedList<Pixel> A = new LinkedList<Pixel>();
+        LinkedList<Pixel> B = new LinkedList<Pixel>();
         for (int i = 0; i < p.getSize(); i++){
             if (p.find(i) == root1) {
                A.add(g.allVertices().get(i).data()); 
@@ -186,7 +187,7 @@ public class P4C {
         int[] diffA = diff(A);
         int[] diffB = diff(B);
         int[] minDiffAB = minArray(diffA, diffB);
-        ArrayList<Pixel> AUB = new ArrayList<Pixel>();
+        LinkedList<Pixel> AUB = new LinkedList<Pixel>();
         AUB.addAll(A);
         AUB.addAll(B);
         int[] diffAUB = diff(AUB);
@@ -205,7 +206,7 @@ public class P4C {
     /** Finds the RGB Difference Tuple for an ArrayList of Pixels
      *  aka. the Set
      */
-    private static int[] diff(ArrayList<Pixel> data) {
+    private static int[] diff(LinkedList<Pixel> data) {
 
         if (data.isEmpty()) {
             int[] result = {0, 0, 0};
