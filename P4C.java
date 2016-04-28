@@ -2,10 +2,15 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+//import java.util.LinkedList;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
@@ -144,7 +149,13 @@ public class P4C {
             //add all edges into min-heap
             heap.insert(edges.get(i));
         }
-     
+        
+        //SUPER IMPORTANT!!!!!!!!!!!!!!!!!!!
+        //Map to contain all known min/maxes of a set: for O(1) access
+        //int[] is length 7: contians minR, minG, minB, maxR, maxG, maxB, SetSize
+        //1!!!!!!!!!!1!!!!!!!
+        Map<Integer, int[]> knownMinMax = new HashMap<Integer, int[]>();
+        
         // process all the edges IN ORDER OF WEIGHT    
         while (!heap.isEmpty()) {
             WEdge<Pixel> current = heap.peek();
@@ -153,9 +164,19 @@ public class P4C {
             
             //if the two roots are NOT equal, then union and add to MST
             //otherwise, do nothing
-            if(root1 != root2 && partialUnion(g, roots, root1, root2, kvalue)){
-                MST.add(current);
-                roots.union(root1, root2);
+            //possibleUnion is the data for the unioned set, if it was to be unioned
+            int[] possibleUnion = partialUnion(g, roots, root1, root2, kvalue, knownMinMax);
+            int newRoot = roots.union2(root1, root2);
+            if(newRoot > -1 && possibleUnion[0] == 0){
+                //we union the sets
+                MST.add(current);                
+                knownMinMax.put(newRoot, Arrays.copyOfRange(possibleUnion, 1, possibleUnion.length));
+                if (newRoot != root1) {
+                    //root1 is the smaller set ABSORBED by the larger set
+                    knownMinMax.remove(root1);
+                } else {
+                    knownMinMax.remove(root2);
+                }
             }
             //remove the processed edge
             heap.remove();
@@ -170,76 +191,120 @@ public class P4C {
      * @param p
      * @param root1
      * @param root2
-     * @return true if partial union condition is satisfied
+     * @return Array of size 8:
+     * index 0: 0 for true, 1 for false
+     * index 1-6: minR, minG, minB, maxR, maxG, maxB
+     * index 7: size of union
      */
-    private static boolean partialUnion(WGraph<Pixel> g, Partition p, int root1, int root2, double k){
-        //A, B are Lists of the Pixels in each Disjoint Set
-        ArrayList<Pixel> A = new ArrayList<Pixel>();
-        ArrayList<Pixel> B = new ArrayList<Pixel>();
-        for (int i = 0; i < p.getSize(); i++){
-            if (p.find(i) == root1) {
-               A.add(g.allVertices().get(i).data()); 
-            } else if (p.find(i) == root2) {
-                A.add(g.allVertices().get(i).data()); 
+    private static int[] partialUnion(WGraph<Pixel> g, Partition p, int root1, int root2, double k, Map<Integer, int[]> m){
+        //int[] is length 7: minR, minG, minB, maxR, maxG, maxB, SetSize
+        int[] A = new int[7];
+        int[] B = new int[7];
+        
+        if (m.containsKey(root1)) {
+            A = m.get(root1);
+        } else {
+            /* if "root1" vertex  does not exist in our map, then it has never been merged
+             * with any other vertex.  Thus it is a Set of size 1!!!! 
+             * 
+             * Furthermore, in this case, the value of 
+             */
+            
+            /*List<Pixel> A = new ArrayList<Pixel>();
+            for (int i = 0; i < p.getSize(); i++){
+                if (p.find(i) == root1) {
+                   A.add(g.allVertices().get(i).data()); 
+                }
             }
+            diffA = diff(A);*/
+            A[0] = g.allVertices().get(root1).data().r();
+            A[1] = g.allVertices().get(root1).data().g();
+            A[2] = g.allVertices().get(root1).data().b();           
+            A[3] = g.allVertices().get(root1).data().r();
+            A[4] = g.allVertices().get(root1).data().g();
+            A[5] = g.allVertices().get(root1).data().b();
+            A[6] = 1;
         }
+        
+        if (m.containsKey(root2)) {
+            B = m.get(root2);
+        } else {
+            /* if "root1" vertex  does not exist in our map, then it has never been merged
+             * with any other vertex.  Thus it is a Set of size 1!!!! 
+             * 
+             * Furthermore, in this case, the value of 
+             */
+            
+            /*List<Pixel> A = new ArrayList<Pixel>();
+            for (int i = 0; i < p.getSize(); i++){
+                if (p.find(i) == root1) {
+                   A.add(g.allVertices().get(i).data()); 
+                }
+            }
+            diffA = diff(A);*/
+            B[0] = g.allVertices().get(root2).data().r();
+            B[1] = g.allVertices().get(root2).data().g();
+            B[2] = g.allVertices().get(root2).data().b();           
+            B[3] = g.allVertices().get(root2).data().r();
+            B[4] = g.allVertices().get(root2).data().g();
+            B[5] = g.allVertices().get(root2).data().b();
+            B[6] = 1;
+        }
+        //A, B are Lists of the Pixels in each Disjoint Set
+            
         int[] diffA = diff(A);
         int[] diffB = diff(B);
-        int[] minDiffAB = minArray(diffA, diffB);
-        ArrayList<Pixel> AUB = new ArrayList<Pixel>();
-        AUB.addAll(A);
-        AUB.addAll(B);
+        int[] AUB = unionMinMax(A,B);   //has the min-max values of the union
         int[] diffAUB = diff(AUB);
         
+        int[] minAB = minArray(diffA, diffB);
+        
         //checking the condition
-        boolean result = true;
+        int[] result = new int[8];
+        result[0] = 0;  //true
+        System.arraycopy(AUB, 0, result, 1, AUB.length);
         for (int i = 0; i < 3; i++){
-            if(diffAUB[i] > (minDiffAB[i] + k / (A.size() + B.size())) ) {
-                //failed the required condition
-                result = false;
+            if (diffAUB[i] > (minAB[i] + k / (A[6] + B[6]))) {
+                //Note: A[6] gives the size of the set A
+                //When we fail the required condition:
+                result[0] = 1;  //false
+                break;
             }
         }
         return result;
     }
-
-    /** Finds the RGB Difference Tuple for an ArrayList of Pixels
-     *  aka. the Set
+    
+    /** the Diff function, knowing the min/ max values of the root already
+     * 
+     * @param seven: the data array of length 7 comprising of:
+     * minR, minG, minB, maxR, maxG, maxB, Setsize
+     * @return
      */
-    private static int[] diff(ArrayList<Pixel> data) {
-
-        if (data.isEmpty()) {
-            int[] result = {0, 0, 0};
-            return result;
-        }
-
-        int minR = data.get(0).r();
-        int minG = data.get(0).g();
-        int minB = data.get(0).b();
-        int maxR = data.get(0).r();
-        int maxG = data.get(0).g();
-        int maxB = data.get(0).b();
-        for (int i = 1; i < data.size(); i++){
-            if (data.get(i).r() < minR) {
-                minR = data.get(i).r();
-            } else if (data.get(i).r() > maxR) {
-                maxR = data.get(i).r();
-            }
-            
-            if (data.get(i).g() < minG) {
-                minG = data.get(i).g();
-            } else if (data.get(i).g() > maxG) {
-                maxG = data.get(i).g();
-            }
-            
-            if (data.get(i).b() < minB) {
-                minB = data.get(i).b();
-            } else if (data.get(i).b() > maxB) {
-                maxB = data.get(i).b();
-            }
-        }
-        
-        int[] result = {maxR - minR, maxG - minG, maxB - minB};
-        return result;
+    private static int[] diff(int[] seven){
+        int[] result = new int[3];
+        result[0] = seven[3] - seven[0];    //r
+        result[1] = seven[4] - seven[1];    //g
+        result[2] = seven[5] - seven[2];    //b
+        return result;        
+    }
+    
+    /** Finds the min/max values of a union of 2 sets: A and B
+     * 
+     * array values are minR, minG, minB, maxR, maxG, maxB, Setsize
+     * @param rootA
+     * @param rootB
+     * @return
+     */
+    private static int[] unionMinMax(int[] A, int[] B) {
+        int[] result = new int[7];
+        result[0] = Math.min(A[0], B[0]);   //minR
+        result[0] = Math.min(A[1], B[1]);   //minG
+        result[0] = Math.min(A[2], B[2]);   //minB
+        result[0] = Math.max(A[3], B[3]);   //maxR
+        result[0] = Math.max(A[4], B[4]);   //maxG
+        result[0] = Math.max(A[5], B[5]);   //maxB
+        result[6] = A[6] + B[6]; //Union  Setsize
+        return result;        
     }
     
     /** Method to do min(Diff(a), diff(b))
@@ -250,9 +315,9 @@ public class P4C {
      */
     private static int[] minArray(int[] a, int[] b) {
         int[] result = new int[3];
-        result[0] = Math.min(a[0], b[0]);
-        result[1] = Math.min(a[1], b[1]);
-        result[2] = Math.min(a[2], b[2]);
+        result[0] = Math.min(a[0], b[0]);   //r
+        result[1] = Math.min(a[1], b[1]);   //g
+        result[2] = Math.min(a[2], b[2]);   //b
         return result;
     }
     
