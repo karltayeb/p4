@@ -3,17 +3,17 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-import WGraphP4.ReverseComparator;
-
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 
 
 public class P4C {
+
 
     /** Convert an image to a graph of Pixels with edges between
      *  north, south, east and west neighboring pixels.
@@ -60,6 +60,7 @@ public class P4C {
 	private static int index (int i, int j, int width) {
 		return (j * width) + i;
 	}
+
 
 	/**
 	 * Helper method that creates the edges in a new image
@@ -111,43 +112,6 @@ public class P4C {
 		}
 
 	}
-
-	//TODO
-    /** Return a list of edges in a minimum spanning forest by
-     *  implementing Kruskal's algorithm using fast union/finds.
-     *  @return a list of the edges in the minimum spanning forest
-     */
-    @Override
-    public List<WEdge<VT>> kruskals() {
-        Partition roots = new Partition(this.allVertices().size());
-        List<WEdge<VT>> MST = new ArrayList<WEdge<VT>>();
-        List<WEdge<VT>> edges = this.allEdges();
-
-        //heap contains all the edges of the graph
-        PQHeap<WEdge<VT>> heap = new PQHeap<WEdge<VT>>(new ReverseComparator());
-        for (int i = 0; i < edges.size(); i++) {
-            //add all edges into min-heap
-            heap.insert(edges.get(i));
-        }
-     
-        // process all the edges IN ORDER OF WEIGHT    
-        while (!heap.isEmpty()) {
-            WEdge<VT> current = heap.peek();
-            int root1 = roots.find(current.source().id());   
-            int root2 = roots.find(current.end().id());     
-            
-            //if the two roots are NOT equal, then union and add to MST
-            //otherwise, do nothing
-            if(root1 != root2){
-                MST.add(current);
-                roots.union(root1, root2);
-            }
-            //remove the processed edge
-            heap.remove();
-        }
-        
-        return MST;
-    }
     
    /** A comparator to make PQHeap a min-heap.
     *
@@ -159,8 +123,8 @@ public class P4C {
        }
    }
    
-    /** Return a list of edges in a minimum spanning forest by
-     *  implementing Kruskal's algorithm using fast union/finds.
+    /** Return a list of MSTs of a graph by 
+     *  modifying Kruskal's algorithm with partial unions
      *  Aka modified Kruskals.
      *  @param g the graph to segment
      *  @param kvalue the value to use for k in the merge test
@@ -169,9 +133,11 @@ public class P4C {
 
     public static List<WEdge<Pixel>> segmenter(WGraph<Pixel> g, double kvalue) {
         Partition roots = new Partition(g.allVertices().size());
+        //ArrayList<ArrayList<WEdge<Pixel>>> MSTGroup = new ArrayList<ArrayList<WEdge<Pixel>>>();
         List<WEdge<Pixel>> MST = new ArrayList<WEdge<Pixel>>();
         List<WEdge<Pixel>> edges = g.allEdges();
 
+        //set up MSTGroup: to have n arrayLists, where 
         //heap contains all the edges of the graph
         PQHeap<WEdge<Pixel>> heap = new PQHeap<WEdge<Pixel>>(new ReverseComparator<WEdge<Pixel>>());
         for (int i = 0; i < edges.size(); i++) {
@@ -181,13 +147,13 @@ public class P4C {
      
         // process all the edges IN ORDER OF WEIGHT    
         while (!heap.isEmpty()) {
-            WEdge<VT> current = heap.peek();
+            WEdge<Pixel> current = heap.peek();
             int root1 = roots.find(current.source().id());   
             int root2 = roots.find(current.end().id());     
             
             //if the two roots are NOT equal, then union and add to MST
             //otherwise, do nothing
-            if(root1 != root2){
+            if(root1 != root2 && partialUnion(g, roots, root1, root2, kvalue)){
                 MST.add(current);
                 roots.union(root1, root2);
             }
@@ -195,10 +161,95 @@ public class P4C {
             heap.remove();
         }
         
+        //List<List<WEdge<Pixel>>> result = MSTGroup;
         return MST;
-    	return null;
+    }
+    
+    /** The Diff(A U B) <= MIN(Diff(A), Diff(B)) + K /(|A| + |B|)
+     *  
+     * @param p
+     * @param root1
+     * @param root2
+     * @return true if partial union condition is satisfied
+     */
+    private static boolean partialUnion(WGraph<Pixel> g, Partition p, int root1, int root2, double k){
+        //A, B are Lists of the Pixels in each Disjoint Set
+        ArrayList<Pixel> A = new ArrayList<Pixel>();
+        ArrayList<Pixel> B = new ArrayList<Pixel>();
+        for (int i = 0; i < p.getSize(); i++){
+            if (p.find(i) == root1) {
+               A.add(g.allVertices().get(i).data()); 
+            } else if (p.find(i) == root2) {
+                A.add(g.allVertices().get(i).data()); 
+            }
+        }
+        int[] diffA = diff(A);
+        int[] diffB = diff(B);
+        int[] minDiffAB = minArray(diffA, diffB);
+        ArrayList<Pixel> AUB = new ArrayList<Pixel>();
+        AUB.addAll(A);
+        AUB.addAll(B);
+        int[] diffAUB = diff(AUB);
+        
+        //checking the condition
+        boolean result = true;
+        for (int i = 0; i < 3; i++){
+            if(diffAUB[i] > (minDiffAB[i] + k / (A.size() + B.size())) ) {
+                //failed the required condition
+                result = false;
+            }
+        }
+        return result;
     }
 
+    /** Finds the RGB Difference Tuple for an ArrayList of Pixels
+     *  aka. the Set
+     */
+    private static int[] diff(ArrayList<Pixel> data){
+        int minR = data.get(0).r();
+        int minG = data.get(0).g();
+        int minB = data.get(0).b();
+        int maxR = data.get(0).r();
+        int maxG = data.get(0).g();
+        int maxB = data.get(0).b();
+        for (int i = 1; i < data.size(); i++){
+            if (data.get(i).r() < minR) {
+                minR = data.get(i).r();
+            } else if (data.get(i).r() > maxR) {
+                maxR = data.get(i).r();
+            }
+            
+            if (data.get(i).g() < minG) {
+                minG = data.get(i).g();
+            } else if (data.get(i).g() > maxG) {
+                maxG = data.get(i).g();
+            }
+            
+            if (data.get(i).b() < minB) {
+                minB = data.get(i).b();
+            } else if (data.get(i).b() > maxB) {
+                maxB = data.get(i).b();
+            }
+        }
+        
+        int[] result = {maxR - minR, maxG - minG, maxB - minB};
+        return result;
+    }
+    
+    /** Method to do min(Diff(a), diff(b))
+     * 
+     * @param a
+     * @param b
+     * @return
+     */
+    private static int[] minArray(int[] a, int[] b) {
+        int[] result = new int[3];
+        result[0] = Math.min(a[0], b[0]);
+        result[1] = Math.min(a[1], b[1]);
+        result[2] = Math.min(a[2], b[2]);
+        return result;
+    }
+    
     /** Internal PixelDistance class implements Distance interface
      *  distance is taken to be the square difference of the four bytes
      *  of the Pixel value integer. Since it considers all four bits
@@ -233,7 +284,7 @@ public class P4C {
     }
 
     public static void main(String[] args) {
-
+       
         final int gray = 0x202020;
 
         try {
@@ -247,53 +298,28 @@ public class P4C {
             System.out.print("NSegments =  "
                              + (g.numVerts() - res.size()) + "\n");
 
-            // Remove all edges not in the minimal spanning forrest
-            for (WEdge<Pixel> edge : g.allEdges()) {
-            	if (!res.contains(edge)) {
-            		g.deleteEdge(edge.source(), edge.end());
-            	}
+            // make a background image to put a segment into
+            for (int i = 0; i < image.getHeight(); i++) {
+                for (int j = 0; j < image.getWidth(); j++) {
+                    image.setRGB(j, i, gray);
+                }
             }
 
-            // We need to account for every vertex
-            List<GVertex<Pixel>> vertices = g.allVertices();
-
-            // Since the graph is now a minimally spanning forest doing
-            // a depth first search on one vertex will uncover all vertices
-            // in a given segment.
-            List<GVertex<Pixel>> visited = new ArrayList<GVertex<Pixel>>();
-            int numSegments = 0;
-            
-            for (GVertex<Pixel> vertex : vertices) {
-            	if (visited.contains(vertex)) {
-            		// we already added the sub graph this vertex belongs to
-            		continue;
-            	}
-
-            	List<GVertex<Pixel>> segment = g.depthFirst(vertex);
-            	visited.addAll(segment);
-            	numSegments++;
-
-	            // make a background image to put a segment into
-	            for (int i = 0; i < image.getHeight(); i++) {
-	                for (int j = 0; j < image.getWidth(); j++) {
-	                    image.setRGB(j, i, gray);
-	                }
-	            }
-
-	            // put the segment in the image
-	            for (GVertex<Pixel> i: segment)  {
-	                Pixel d = i.data();
-	                image.setRGB(d.col(), d.row(), d.value());
-	            }
-
-	            // save file
-	            String savename = "output" + numSegments + ".png";
-	            File f = new File(savename);
-	            ImageIO.write(image, "png", f);            	
-
+            /**
+            // After you have a spanning tree connected component x, 
+            // you can generate an output image like this:
+            for (GVertex<Pixel> i: x)  {
+                Pixel d = i.data();
+                image.setRGB(d.col(), d.row(), d.value());
             }
 
+            File f = new File("output.png");
+            ImageIO.write(image, "png", f);
 
+            // You'll need to do that for each connected component,
+            // writing each one to a different file, clearing the
+            // image buffer first
+			*/
         } catch (IOException e) {
             System.out.print("Missing File!\n");
 
