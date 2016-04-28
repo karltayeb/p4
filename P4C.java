@@ -2,6 +2,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.util.List;
+import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -205,6 +206,10 @@ public class P4C {
      *  aka. the Set
      */
     private static int[] diff(ArrayList<Pixel> data) {
+        if (data.isEmpty()) {
+            int[] result = {0, 0, 0};
+            return result;
+        }
         int minR = data.get(0).r();
         int minG = data.get(0).g();
         int minB = data.get(0).b();
@@ -285,7 +290,7 @@ public class P4C {
     public static void main(String[] args) {
        
         final int gray = 0x202020;
-
+        
         try {
           // the line that reads the image file
 
