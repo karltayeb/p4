@@ -72,7 +72,7 @@ public class P4C {
 	 * checks for boundary cases like edges and corners
 	 * @param i the row of the current pixel
 	 * @param j the col of the the current pixel
-	 */    
+	 */
 	private static void putEdges(WGraphP4<Pixel> graphImage, 
 		List<GVertex<Pixel>> verts, int i, int j,
 		int height, int width, Distance<Pixel> pd) {
@@ -123,21 +123,17 @@ public class P4C {
      */
 
     public static List<WEdge<Pixel>> segmenter(WGraph<Pixel> g, double kvalue) {
-        System.out.println("in segmenter");
 
         Partition roots = new Partition(g.allVertices().size());
-        System.out.println("a");
+
         //ArrayList<ArrayList<WEdge<Pixel>>> MSTGroup = new ArrayList<ArrayList<WEdge<Pixel>>>();
         List<WEdge<Pixel>> MST = new ArrayList<WEdge<Pixel>>();
         List<WEdge<Pixel>> edges = g.allEdges();
-        System.out.println("b");
 
         //set up MSTGroup: to have n arrayLists, where 
         //heap contains all the edges of the graph
         PQHeap<WEdge<Pixel>> heap = new PQHeap<WEdge<Pixel>>(new ReverseComparator<WEdge<Pixel>>());
-        System.out.println("getting edges");
         heap.init(g.allEdges());
-        System.out.println("got edges");
         //SUPER IMPORTANT!!!!!!!!!!!!!!!!!!!
         //Map to contain all known min/maxes of a set: for O(1) access
         //int[] is length 7: contians minR, minG, minB, maxR, maxG, maxB, SetSize
@@ -357,6 +353,10 @@ public class P4C {
             System.out.print("result =  " + res.size() + "\n");
             System.out.print("NSegments =  "
                              + (g.numVerts() - res.size()) + "\n");
+            System.out.print("Note: it there are more than 10 segments we only save segments with number of pixels > 1% of total image.\n");
+
+            int nsegments = g.numVerts() - res.size();
+            int minsegmentsize = (int) (image.getHeight() * image.getWidth() * 0.01);
 
             // Clear out the edges in g
             // add back all the edges in res
@@ -367,16 +367,15 @@ public class P4C {
                 g.addEdge(edge);
             }
 
-            System.out.println("c");
-
             // We need to account for every vertex
+            // Every vertex will be part of a segment
             List<GVertex<Pixel>> vertices = g.allVertices();
 
             // Since the graph is now a minimally spanning forest doing
             // a depth first search on one vertex will uncover all vertices
             // in a given segment.
             HashSet<GVertex<Pixel>> visited = new HashSet<GVertex<Pixel>>();
-            int numSegments = 0;
+            int segmentNum = 0;
             
             for (GVertex<Pixel> vertex : vertices) {
               if (visited.contains(vertex)) {
@@ -384,12 +383,15 @@ public class P4C {
                 continue;
               }
 
-              System.out.println("d");
+              // Do a depth first search on the vertex, yielding the segment
               List<GVertex<Pixel>> segment = g.depthFirst(vertex);
-              System.out.println("e");
+              // Add all vertices in the segment to visited
               visited.addAll(segment);
-              System.out.println("f");
-              numSegments++;
+
+              if (nsegments > 10 && segment.size() < minsegmentsize) {
+                continue;
+              }
+              segmentNum++;
 
               // make a background image to put a segment into
               for (int i = 0; i < image.getHeight(); i++) {
@@ -405,11 +407,15 @@ public class P4C {
               }
 
               // save file
-              String savename = "output" + numSegments + ".png";
+              String savename = args[0].substring(0, args[0].length() - 4) + segmentNum + ".png";
+              System.out.println(savename);
               File f = new File(savename);
               ImageIO.write(image, "png", f);             
 
             }
+
+            System.out.print("NSegments Saved =  "
+                             + segmentNum + "\n");
 
 
         } catch (IOException e) {
