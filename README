@@ -1,63 +1,101 @@
 Karl Tayeb ktayeb1
 Natasha Bornhorst nbornho1
 Richard Ding rding2
-CS226.02 
-P4C
+CS226.02 MWF 3:00 - 4:15 PM
+P4
 Due: 4/30/2016
 
 Part A:
 
-We chose to first make GVertex and WEdge with comparable generics. We did this because we felt it would require less transition to have these and simply implement WGraphP4 with these (since they would now be weighted, generic, and comprable) rather than going through all the trouble of making WGraphP4 extending the WGraph interface and then switching over to make the Edges and Vertices as they were supposed to be.
+We chose to first make GVertex and WEdge with comparable generics. 
+We did this because we felt it would require less transition to have these and simply implement WGraphP4 with these 
+(since they would now be weighted, generic, and comparable) rather than going through all the trouble of making WGraphP4 
+extending the WGraph interface and then switching over to make the Edges and Vertices as they were supposed to be.
 
 GVertex and WEdge were initially extended by Karl, but all three group members contributed to implementing their methods.
 
-To make WGraphP4 we essentially went method by method and cleared out all the easy methods making the changes necessary to make it work with the interface, WEdge, and GVertex. Our approach with the adjacency list was to make an array list of array lists of edges. We chose to store edges because they contain all the information necessary, rather than edges and vertices--since this would be redundant (edges store references to the pertinent vertices). All of the methods, with the exception of kruskals and depth first search were done in a group programming setting.
+To make WGraphP4 we wrote it method by method and quickly finished all the easy methods, 
+making the changes necessary to make it work with the interface, WEdge, and GVertex.  We then spent much more time 
+completing the harder methods such as Kruskals and Depth-first. 
+Our approach with the adjacency list was to make an array list of array lists of edges. 
+We chose to store edges because they contain all the information necessary, rather than edges and vertices because that would be redundant 
+(edges store references to the pertinent vertices). 
+All of the methods, with the exception of Kruskals and Depth-first search were done in a group programming setting.
 
-Natasha wrote the test file for WGraph, she also implemented depth first search.
+Natasha wrote the JUnit test file for WGraph, and also implemented Depth-first search.
 
 Part B:
 
-Richard is largely credited for our implementation of kruskals algorithm. Natasha and Richard wrote the tests for kruskal's algorithm.
+Richard wrote our implementation of Kruskals algorithm. Natasha and Richard wrote the tests for Kruskal's algorithm.
 
-Karl did most of the work for creating the general PQHeap since he had wrote a max heap for the MaxPQHeap test file assignment earlier. He also adapted, corrected, and updated, his test file which is included in this submission as PQHeapTest.java. One of the big challenges was dealing with rounding errors in the indexing calculations. We nded up adding a small 1e-10 value to calculations when doing floor functions to avoid truncating. In testing we found this sufficient for fairly large values. 
+Karl did most of the work for creating the general PQHeap since he had written a max heap for the MaxPQHeap 
+test file assignment earlier. He also adapted, corrected and updated his test file which is included in this 
+submission as PQHeapTest.java. One of the big challenges was dealing with rounding errors in the indexing calculations. 
+We ended up adding a small 1e-10 value to calculations when doing floor functions to avoid truncating. 
+In testing we found this sufficient for fairly large values. 
 
 Part C:
 
-Karl worked with Natasha to make Pixel and making a graph representation of the image.
+Karl worked with Natasha to make Pixel.java and making a graph representation of the image.
 
-In a group setting we figured out our approach to implementing the modified kruskal's, although Richard was mainly in the drivers seat for coding. Karl and Natasha helped debug aftewards.
+In a group setting we figured out our approach to implementing the modified kruskal's, 
+although Richard was mainly in the drivers seat for coding. Karl and Natasha helped debug afterwards.
 
-Karl wrote the code in main() of P4C. At first the program ran extremely slowly but eventually produced well segmented images. To resolve this slow runtime we went back through our earlier methods and made better data-structures choices. In a group setting we combed through our code and found where we could improve on efficiency. 
+Karl wrote the code in main() of P4C. At first the program ran extremely slowly but eventually produced well segmented images. 
+To resolve this slow runtime we went back through our earlier methods and made better data-structures choices. 
+In a group setting we combed through our code and found where we could improve on efficiency. 
 
-In particular, we found HashSets be particular useful in cases were we needed to search for vertices or edges. In particular, allEdges() in WGraph P4 although it returns a list, had to check to make sure duplicated edges werent being added to the list (since our adjacency list adds an edge to both the source and end members adjacency lists). By adding to a hashset and then making a list from the set we were drastically able to improve run time.
+In particular, we found HashSets be particular useful in cases were we needed to search for vertices or edges. 
+For example, allEdges() in WGraphP4 returns a list but it had to check to make sure duplicated edges weren't 
+being added to the list (since our adjacency list adds an edge to both the source and end members adjacency lists). 
+By adding edges to a Hashset and then making a list from the set we were able to drastically able improve run time.
 
-Additionally we found it much faster to remove all the edges from the list and add back the edges found by segmenter than it was to search for and remove the edges not returned by segmenter. By doing this, we could then use a depth first search at a given vertex to get all the vertices in a segment. This is the general approach we used for getting the pixels of a segment and saving them to images.
+Additionally we found it much faster to remove all the edges from the list and add back the edges found by segmenter() 
+than it was to search for and remove the edges not returned by segmenter(). By doing this, we could then use a 
+Depth-first search at a given vertex to get all the vertices in a segment. This is the general approach we used for 
+getting the pixels of a segment and saving them to images.
+
+In segmenter(), the modified Kruskals method, we have a HashMap<Integer, int[]> where we store the min/max values of a segment
+while we build the spanning forest.  This is so we don't have to go through an entire tree to find the min/max RGB values every time 
+we check to add an edge to the forest or not.  The Key is an Integer and is the root of the tree in consideration.  The Value is an int[]
+of length 7 that has the following data values in order from index 0-6: minRed, minBlue, minG, maxRed, maxBlue, maxGreen, treeSize.
+All the helper methods of the modified Kruskals method, including partialUnion() where we check the additional condition of the modified Kruskals
+algorithm, are based around this int[] of data values pertaining to each tree.  
 
 Summary of P4C Results:
 
-We found that while segmenter could come up with 1000s of segments at low k values, a few of them were true segments and others were largely empty. However, if we made k values exceedingly large (on the order of millions) we could shrink the number of segments but we would still get dozens of segments with almost nothing in them and one segment with the image. To resolve this we chose to make it that if there are more than 10 segments we only save the segments that account for more than 1% of the pixels in the total image. I think on piazza somewhere it said use 10% but we found that that was too large of a requirement for segments in a file like Edge.png.
+We found that while segmenter() could come up with 1000s of segments at low k values, a few of them were true segments 
+and others were largely empty. However, if we made k values exceedingly large (on the order of millions) 
+we could shrink the number of segments but we would still get dozens of segments with almost nothing in them 
+and one segment with the image. To resolve this we chose to make it that if there are more than 10 segments 
+we only save the segments that account for more than 1% of the pixels in the total image. I think on piazza somewhere 
+it said use 10% but we found that that was too large of a requirement for segments in a file like Edge.png.
 
-This approach allows us to use low k values where they yield accurate segments while filtering out most of the (very small, mostyle empty, not representative of actual edges in the image).
+This approach allows us to use low k values where they yield accurate segments while filtering out most of the 
+very small, mostly empty segments that are not representative of actual segments in the image.
 
 Below is a summary of the test images, at what k value they were segmented, and a description of the results.
 
 JHULogo.png segmented at k = 500000
-5 segments saved, good seperateion of the shield, background, and 3 letters
+5 segments saved, good separation of the shield, background, and 3 letters
 
 BlackSquare.png segmented at k = 5
-2 Segments saved, the gray outer square and the lightgray/white inner square
+2 Segments saved, the gray outer square and the light-gray/white inner square
 
 Edges.png segmented at k = 1
-9 segments saved. We do get good segments of the black background out of the square as well as the top, left, and bottom edges. However, the inner black square and the right red edge get combined. There are a few other segments with not much in them.
+9 segments saved. We do get good segments of the black background out of the square as well as the top, left, and bottom edges. 
+However, the inner black square and the right red edge get combined. There are a few other segments with not much in them.
 
 Blue.png segmented at k = 1
-2 segments saved. blue1.png doesnt seem to have anything in it. blue2.png has the blue square.
+2 segments saved. blue1.png seems to have the border of the square. blue2.png has the middle of the blue square.
 
-test1.png segmeted at k = 1000
-10 segments saved. They all capture patches of green or white in the image. It doesn't seem to capture the whole image, in particular the red-orange dot did not make it into a saved segment.
+test1.png segmented at k = 1000
+10 segments saved. They all capture patches of green or white in the image. It doesn't seem to capture the whole image, 
+in particular the red-orange dot did not make it into a saved segment.
 
 test3.png segmented at k = 100
-2 segments saved, it takes the grapefruit-red bar on the left of the image and the oval. The rest of the image, where there is a gradient made too many tiny segments that by the saving rules we established did not make the cut.
+2 segments saved, it takes the grapefruit-red bar on the left of the image and the oval. The rest of the image, where there is 
+a gradient, made too many tiny segments that by the saving rules we established did not make the cut.
 
 test4.png segmented at k = 500
 4 segments saved, 1 appears empty, the other 3 are the blue and the two orange circles respectively.
