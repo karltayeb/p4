@@ -166,42 +166,67 @@ public class WGraphTest {
     @Test
     public void testEdges() {
         assertEquals("[]", g.allEdges().toString());
-               
         g.addVertex(a);
         g.addVertex(b);
         g.addVertex(c);
         g.addVertex(q);
         g.addVertex(w);
         g.addVertex(r);
-        g.addEdge(ac);        
-        assertEquals("[(4, 6, 1.0)]", g.allEdges().toString());
+
+        g.addEdge(ac);
+        assertTrue(g.allEdges().contains(ac));
+        System.out.println(g.allEdges().size());
+        assertTrue(g.allEdges().size() == 1);
+
         g.addEdge(aq);
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0)]", g.allEdges().toString());        
+        assertTrue(g.allEdges().contains(aq));
+        assertTrue(g.allEdges().size() == 2);
+
         g.addEdge(qb);
-        /* NOTE:
-         * AllEdges returns edges such that source.id() < end.id()
-         * aka: WEdge(source, end, weight) where source < end 
-         */
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 7, 3.0)]", g.allEdges().toString());
+        assertTrue(g.allEdges().contains(qb));
+        assertTrue(g.allEdges().size() == 3);
+
         g.addEdge(bw);
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 7, 3.0), (5, 8, 4.0)]", g.allEdges().toString());
+        assertTrue(g.allEdges().contains(bw));
+        assertTrue(g.allEdges().size() == 4);
+
+
         g.addEdge(wr);
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 7, 3.0), (5, 8, 4.0), (8, 9, 5.0)]", g.allEdges().toString());
+        assertTrue(g.allEdges().contains(wr));
+        assertTrue(g.allEdges().size() == 5);
+
         g.addEdge(br);
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 7, 3.0), (5, 8, 4.0), (5, 9, 6.0), (8, 9, 5.0)]", g.allEdges().toString());
+        assertTrue(g.allEdges().contains(br));
+        assertTrue(g.allEdges().size() == 6);
+
         assertFalse(g.addEdge(bw));
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 7, 3.0), (5, 8, 4.0), (5, 9, 6.0), (8, 9, 5.0)]", g.allEdges().toString());
+        assertTrue(g.allEdges().contains(bw));
+        assertTrue(g.allEdges().size() == 6);
+
         assertTrue(g.deleteEdge(q, b));
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 8, 4.0), (5, 9, 6.0), (8, 9, 5.0)]", g.allEdges().toString());
+        assertFalse(g.allEdges().contains(qb));
+        assertTrue(g.allEdges().size() == 5);
+
         assertTrue(g.deleteEdge(w, r));
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 8, 4.0), (5, 9, 6.0)]", g.allEdges().toString());
+        assertFalse(g.allEdges().contains(wr));
+        assertTrue(g.allEdges().size() == 4);
+
         assertTrue(g.deleteEdge(b, r));
-        assertEquals("[(4, 6, 1.0), (4, 7, 2.0), (5, 8, 4.0)]", g.allEdges().toString());
+        assertFalse(g.allEdges().contains(br));
+        assertTrue(g.allEdges().size() == 3);
+
         assertTrue(g.deleteEdge(a, q));
-        assertEquals("[(4, 6, 1.0), (5, 8, 4.0)]", g.allEdges().toString());
+        assertFalse(g.allEdges().contains(aq));
+        assertTrue(g.allEdges().size() == 2);
+
         assertTrue(g.deleteEdge(a, c));
-        assertEquals("[(5, 8, 4.0)]", g.allEdges().toString());
+        assertFalse(g.allEdges().contains(ac));
+        assertTrue(g.allEdges().size() == 1);
+
         assertTrue(g.deleteEdge(b, w));
+        assertFalse(g.allEdges().contains(bw));
+        assertTrue(g.allEdges().size() == 0);
+
         assertFalse(g.deleteEdge(w, b));
         
     }
@@ -309,14 +334,6 @@ public class WGraphTest {
         assertEquals(b, dfirst.get(3));
         assertEquals(a, dfirst.get(4));
         assertEquals(r, dfirst.get(5));
- 
-
 
     }
-
-
-
- 
-
-
 }
