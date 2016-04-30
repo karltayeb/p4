@@ -11,7 +11,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
     private int nextID;
 
     /** the vertices */
-    private ArrayList<GVertex<VT>> verts;
+    private HashSet<GVertex<VT>> verts;
     public ArrayList<ArrayList<WEdge<VT>>> adjlist;
     private int numEdges;
 
@@ -19,7 +19,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
     public WGraphP4() {
         this.nextID = 0;
         this.numEdges = 0;
-        this.verts = new ArrayList<GVertex<VT>>();
+        this.verts = new HashSet<GVertex<VT>>();
         this.adjlist = new ArrayList<ArrayList<WEdge<VT>>>();
     }
 
@@ -82,22 +82,20 @@ public class WGraphP4<VT> implements WGraph<VT> {
      */
     @Override
     public boolean addEdge(GVertex<VT> v, GVertex<VT> u, double w) {
-        boolean success = true;
+        
         if (this.adjlist.size() < v.id()){
             for (int i = this.adjlist.size(); i <= v.id() + 1; i++) {
                 this.adjlist.add(new ArrayList<WEdge<VT>>());
-            }
-            success = this.addVertex(v);            
+            }          
         }
         if (this.adjlist.size() < u.id()){
             for (int i = this.adjlist.size(); i <= u.id() + 1; i++) {
                 this.adjlist.add(new ArrayList<WEdge<VT>>());
             }
-            success = this.addVertex(u);
         }
-
-        if (!success)
-            return false;
+        
+        this.addVertex(v);
+        this.addVertex(u); 
 
         // put the edge in, if not already there
         boolean edgeExists = this.areAdjacent(v, u);
@@ -194,7 +192,9 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     @Override
     public List<GVertex<VT>> allVertices() {
-        return this.verts;
+        ArrayList<GVertex<VT>> vertlist = new ArrayList<GVertex<VT>>();
+        vertlist.addAll(this.verts);
+        return vertlist;
     }
 
     //TODO

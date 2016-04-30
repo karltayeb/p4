@@ -175,7 +175,6 @@ public class WGraphTest {
 
         g.addEdge(ac);
         assertTrue(g.allEdges().contains(ac));
-        System.out.println(g.allEdges().size());
         assertTrue(g.allEdges().size() == 1);
 
         g.addEdge(aq);

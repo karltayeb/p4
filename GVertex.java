@@ -1,4 +1,12 @@
-/** Class to represent a vertex (in a graph).
+/**
+ *Karl Tayeb ktayeb1
+ *Natasha Bornhorst nbornho1
+ *Richard Ding rding2
+ *CS226.02 
+ *P4C
+ */
+
+ /** Class to represent a vertex (in a graph).
  */
 public class GVertex<T> implements Comparable<GVertex<T>> {
 

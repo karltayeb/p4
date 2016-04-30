@@ -51,7 +51,7 @@ Edges.png segmented at k = 1
 9 segments saved. We do get good segments of the black background out of the square as well as the top, left, and bottom edges. However, the inner black square and the right red edge get combined. There are a few other segments with not much in them.
 
 Blue.png segmented at k = 1
-2 segments saved. blue1.png doesnt seem to have anything in it. blue2.png has the blue square.
+2 segments saved. blue1.png doesnt seem to have anything but what looks like a drop shadow on the bottom. blue2.png has the blue square.
 
 test1.png segmeted at k = 1000
 10 segments saved. They all capture patches of green or white in the image. It doesn't seem to capture the whole image, in particular the red-orange dot did not make it into a saved segment.
@@ -60,8 +60,14 @@ test3.png segmented at k = 100
 2 segments saved, it takes the grapefruit-red bar on the left of the image and the oval. The rest of the image, where there is a gradient made too many tiny segments that by the saving rules we established did not make the cut.
 
 test4.png segmented at k = 500
-4 segments saved, 1 appears empty, the other 3 are the blue and the two orange circles respectively.
+4 segments saved, this one worked perfectly. 1 for the white background, 1 for the blue, and 2 for the orange ovals
 
 testIn.png segmented at k = 100
 We got the same results from this as we did from test3.png
+
+stripe.png k = 1
+3 segments as expected
+
+bwtest.png k = 1
+2 segments, for some reason we can't figure we seem to miss putting the black part in its own segment, it gets grouped with one of the white stripes. This is suprising since segmenter generally works well otherwise, yet in this one case it fails to seperate black and white, the most drastic difference possible. We're left scratching our heads here since it worked on stripe.png.
 

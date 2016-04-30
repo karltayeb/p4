@@ -1,9 +1,11 @@
 /**
  * Karl Tayeb ktayeb1
- * Jack Karyo jkaryo1
- * Assignment: A4
- * Due: 4/13/2016
+ * Natasha Bornhorst nborno1
+ * Richard Ding rding2
+ * Assignment: P4
+ * Due: 4/30/2016
  */
+
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +13,7 @@ import java.lang.Math;
 import java.util.List;
 import java.util.LinkedList;
 
-public class PQTestKarl {
+public class PQHeapTest {
 	static PQHeap<Integer> empty;
 	static PQHeap<Integer> smalltolarge;
 	static PQHeap<Integer> largetosmall;
