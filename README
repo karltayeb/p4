@@ -99,6 +99,16 @@ fairly well. We are happy to see that it segments most of the test files success
 
 Like another group on Piazza, for some of the images the background is transparent for some reason.
 
+
+|||||||||||
+CHECKSTYLE:
+|||||||||||
+
+All of our code is checkstyle compliant, except for the fact that
+Pixel and P4C have magic numbers for bitshifting. However, it was
+stated on piazza that magic numbers were permissible on this assignment.
+
+
 |||||||||||||||||||||||
 Summary of P4C Results:
 |||||||||||||||||||||||
