@@ -1,12 +1,14 @@
+/** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
 /** Implementation of an edge class (for graphs), could be directed or not.
- */
+ *  @param <VT> vt. 
+*/
 public class WEdge<VT> implements Comparable<WEdge<VT>> {
 
     /** Starting vertex of an edge. */
     private GVertex<VT> source;
     /** Ending vertex of an edge. */
     private GVertex<VT> end;
-    /** Weight of the edge */
+    /** Weight of the edge. */
     private double weight;
 
     /** Create an undirected edge.
@@ -22,9 +24,9 @@ public class WEdge<VT> implements Comparable<WEdge<VT>> {
     }
 
     /** Create an edge.
-     *  @param u the start
-     *  @param v the end
-     *  @param dir true if directed, false otherwise
+     *  @param u the start.
+     *  @param v the end.
+     *  @param w weight.
      */
     public WEdge(GVertex<VT> u, GVertex<VT> v, double w) {
         this.source = u;
@@ -54,15 +56,19 @@ public class WEdge<VT> implements Comparable<WEdge<VT>> {
         return this.end;
     }
 
+    /** Returns true if vertex exists, false if it doesn't. 
+ *      @param v v. 
+ *      @return boolean. */
     public boolean hasVertex(GVertex<VT> v) {
         return (this.source.equals(v) || this.end.equals(v));
     }
 
     /** Create a string representation of the edge.
-     *  @return the string as (source,end)
+     *  @return the string as (source,end).
      */
     public String toString() {
-        return "(" + this.source.toString() + ", " + this.end.toString() + ", " + this.weight + ")";
+        return "(" + this.source.toString() 
+                        + ", " + this.end.toString() + ", " + this.weight + ")";
     }
 
     /** Check if two edges are the same.
@@ -102,15 +108,15 @@ public class WEdge<VT> implements Comparable<WEdge<VT>> {
      * 
      * @return the weight (double)
      */
-    public double weight(){
+    public double weight() {
         return this.weight;
     }
     
-    /** Sets the weight of the WEdge to a new (double)
+    /** Sets the weight of the WEdge to a new (double).
      * 
-     * @param x : the new weight
+     * @param x : the new weight.
      */
-    public void setWeight(double x){
+    public void setWeight(double x) {
         this.weight = x;
     }
 

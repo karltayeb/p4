@@ -1,3 +1,4 @@
+/** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
 /** Implementation of tree-based set partitions with fast union/find.
  *  Adapted from Shaffer/OpenDSA text.
  */
@@ -18,7 +19,7 @@ public class Partition {
     public Partition(int num) {
         this.size = num;
         this.parent = new int[num];
-	    this.weight = new int[num];
+        this.weight = new int[num];
         for (int i = 0; i < this.size; i++) {
             this.parent[i] = -1;
             this.weight[i] = 1;
@@ -30,8 +31,8 @@ public class Partition {
      *  @param b the second node
      */
     void union(int a, int b) {
-        int root1 = find(a);     // Find root of node a
-        int root2 = find(b);     // Find root of node b
+        int root1 = this.find(a);     // Find root of node a
+        int root2 = this.find(b);     // Find root of node b
         if (root1 != root2) {    // Merge with weighted union
             if (this.weight[root2] > this.weight[root1]) {
                 this.parent[root1] = root2;
@@ -52,8 +53,8 @@ public class Partition {
      *  
      */
     int union2(int a, int b) {
-        int root1 = find(a);     // Find root of node a
-        int root2 = find(b);     // Find root of node b
+        int root1 = this.find(a);     // Find root of node a
+        int root2 = this.find(b);     // Find root of node b
         if (root1 != root2) {    // Merge with weighted union
             if (this.weight[root2] > this.weight[root1]) {
                 this.parent[root1] = root2;
@@ -79,8 +80,9 @@ public class Partition {
         this.parent[curr] = this.find(this.parent[curr]);
         return this.parent[curr];
     }
-    
-    public int getSize(){
+    /** Returns the size of the partition. 
+ *      @return int size of partition. */   
+    public int getSize() {
         return this.size;
     }
 }
