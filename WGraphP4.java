@@ -36,13 +36,6 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     @Override
     public int numEdges() {
-        /**
-        int count = 0; 
-        for (ArrayList<WEdge<VT>> list : adjlist) {
-            count += list.size();
-        }
-        return count/2;
-        */
         return this.numEdges;
     }
 
@@ -98,13 +91,20 @@ public class WGraphP4<VT> implements WGraph<VT> {
     @Override
     public boolean addEdge(GVertex<VT> v, GVertex<VT> u, double w) {
         boolean success = true;
-        if (this.adjlist.size() < v.id()) {
-            success = this.addVertex(v);
+        if (this.adjlist.size() < v.id()){
+            for (int i = this.adjlist.size(); i <= v.id() + 1; i++) {
+                this.adjlist.add(new ArrayList<WEdge<VT>>());
+            }
+            success = this.addVertex(v);            
         }
-        if (success && (this.adjlist.size() < u.id())) {
+        if (this.adjlist.size() < u.id()){
+            for (int i = this.adjlist.size(); i <= u.id() + 1; i++) {
+                this.adjlist.add(new ArrayList<WEdge<VT>>());
+            }
             success = this.addVertex(u);
         }
-        if (!success) {
+
+        if (!success)
             return false;
         }
 
@@ -112,14 +112,14 @@ public class WGraphP4<VT> implements WGraph<VT> {
         boolean edgeExists = this.areAdjacent(v, u);
         if (!edgeExists) {
             this.adjlist.get(v.id()).add(new WEdge<VT>(v, u, w));
-            this.adjlist.get(u.id()).add(new WEdge<VT>(u, v, w));
+            this.adjlist.get(u.id()).add(
+                this.adjlist.get(v.id()).get(this.adjlist.get(v.id()).size() - 1));
             this.numEdges++;
             return true;
         }
         return false;  // was already there
     }
 
-    
     @Override
     public boolean deleteEdge(GVertex<VT> v, GVertex<VT> u) {
         if (this.areAdjacent(v, u)) {
@@ -206,7 +206,6 @@ public class WGraphP4<VT> implements WGraph<VT> {
         return this.verts;
     }
 
-    //TODO
     /** depthFirst search. 
  *      @param v v. 
  *      @return List<GVertex<VT>> vt. */
@@ -235,7 +234,6 @@ public class WGraphP4<VT> implements WGraph<VT> {
         
     }
 
-    //TODO
     /** Return a list of all the edges incident on vertex v.  
      *  @param v the starting vertex
      *  @return the incident edges
@@ -245,7 +243,6 @@ public class WGraphP4<VT> implements WGraph<VT> {
         return this.adjlist.get(v.id());
     }
     
-    //TODO
     /** Return a list of edges in a minimum spanning forest by
      *  implementing Kruskal's algorithm using fast union/finds.
      *  @return a list of the edges in the minimum spanning forest
