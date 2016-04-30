@@ -29,6 +29,7 @@ public final class P4C {
         int width = image.getWidth();
         WGraphP4<Pixel> imageGraph = new WGraphP4();
         List<GVertex<Pixel>> verts;
+
         // Populate the graph with vertices
         // reads left to right, top down across image
         // the ID of pixel (i,j) is (j*width)+i
@@ -382,7 +383,7 @@ public final class P4C {
             System.out.print("result =  " + res.size() + "\n");
             System.out.print("NSegments =  "
                              + (g.numVerts() - res.size()) + "\n");
-            System.out.print("Note: it there are more than 10 segments" 
+            System.out.print("Note: if there are more than 10 segments" 
                                        + "we only save segments with number"
                                        + "of pixels > 1% of total image.\n");
 

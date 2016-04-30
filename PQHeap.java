@@ -22,6 +22,9 @@ import java.util.Comparator;
 public class PQHeap<T extends Comparable<? super T>> 
                                      implements PriorityQueue<T> {
 
+    /** For rounding error. */
+    private static final double ROUND = 1e-10;
+
     /** Array List to put the heap in. */
     private ArrayList<T> heap;
     /** Comparator. */
@@ -117,14 +120,14 @@ public class PQHeap<T extends Comparable<? super T>>
         int lastIndex = this.heap.size() - 1;
 
         int level = (int) (Math.floor(Math.log(lastIndex) 
-                                        / Math.log(2) + 1e-10));
-        int levelstart = (int) (Math.pow(2, level) + 1e-10);
+                                        / Math.log(2) + ROUND));
+        int levelstart = (int) (Math.pow(2, level) + ROUND);
         int levelend = lastIndex;
 
         while (level > 0) {
             level--;
-            levelstart = (int) (Math.pow(2, level) + 1e-10);
-            levelend = (int) (Math.pow(2, level + 1) + 1e-10) - 1;
+            levelstart = (int) (Math.pow(2, level) + ROUND);
+            levelend = (int) (Math.pow(2, level + 1) + ROUND) - 1;
 
             for (int i = levelstart; i <= levelend; i++) {
                 int childIndex = this.getChildIndex(i);
@@ -192,11 +195,11 @@ public class PQHeap<T extends Comparable<? super T>>
         }
 
         int level = (int) Math.floor(Math.log(index) 
-                               / Math.log(2) + 1e-10); // level index in heap
-        int offset = index % (int) (Math.pow(2, level) + 1e-10);
+                               / Math.log(2) + ROUND); // level index in heap
+        int offset = index % (int) (Math.pow(2, level) + ROUND);
         int plevel = level - 1;
         // the first index at the level
-        int plevelstart = (int) (Math.pow(2, plevel) + 1e-10);
+        int plevelstart = (int) (Math.pow(2, plevel) + ROUND);
         int poffset = offset / 2;  // positions over level start
         return plevelstart + poffset;  // index of parent
     }
@@ -207,12 +210,12 @@ public class PQHeap<T extends Comparable<? super T>>
      */
     public int getChildIndex(int index) {
         // Level of current index
-        int level = (int) (Math.floor(Math.log(index) / Math.log(2) + 1e-10));
+        int level = (int) (Math.floor(Math.log(index) / Math.log(2) + ROUND));
         // Offset of current index
-        int offset = index % (int) (Math.pow(2, level) + 1e-10);
+        int offset = index % (int) (Math.pow(2, level) + ROUND);
         // Level of child
         int clevel = level + 1;
-        int childIndex = (int) (Math.pow(2, clevel) + 1e-10) + (offset * 2);
+        int childIndex = (int) (Math.pow(2, clevel) + ROUND) + (offset * 2);
 
         // Ensure that we can get to it and it's sibling in the heap
         this.heap.ensureCapacity(childIndex + 2); 
