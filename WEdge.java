@@ -1,3 +1,4 @@
+/** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
 /** Implementation of an edge class (for graphs), could be directed or not.
  *  @param <VT> vt. 
 */

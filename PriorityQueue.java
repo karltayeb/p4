@@ -1,3 +1,4 @@
+/** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
 import java.util.Collection;
 
 /** This is specifies a general Priority Queues of ordered values.

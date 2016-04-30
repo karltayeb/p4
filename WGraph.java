@@ -1,3 +1,4 @@
+/** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
 import java.util.List;
 
 /** Interface for a weighted undirected graph.

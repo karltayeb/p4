@@ -1,11 +1,4 @@
-/**
- *Karl Tayeb ktayeb1
- *Natasha Bornhorst nbornho1
- *Richard Ding rding2
- *CS226.02 
- *P4C
- */
-
+/** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
 import org.junit.Test;
 import org.junit.Before;
 import static org.junit.Assert.assertEquals;

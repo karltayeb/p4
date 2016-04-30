@@ -1,3 +1,4 @@
+/** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
 /** Class to represent a vertex (in a graph).
     @param <T> GVertex.
  */

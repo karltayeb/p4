@@ -1,3 +1,4 @@
+/** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
 /** Exception class for empty Queues.
  */
 public class QueueEmptyException extends RuntimeException {
