@@ -30,13 +30,6 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     @Override
     public int numEdges() {
-        /**
-        int count = 0; 
-        for (ArrayList<WEdge<VT>> list : adjlist) {
-            count += list.size();
-        }
-        return count/2;
-        */
         return this.numEdges;
     }
 
@@ -90,10 +83,19 @@ public class WGraphP4<VT> implements WGraph<VT> {
     @Override
     public boolean addEdge(GVertex<VT> v, GVertex<VT> u, double w) {
         boolean success = true;
-        if (this.adjlist.size() < v.id())
-            success = this.addVertex(v);
-        if (success && (this.adjlist.size() < u.id()))
+        if (this.adjlist.size() < v.id()){
+            for (int i = this.adjlist.size(); i <= v.id() + 1; i++) {
+                this.adjlist.add(new ArrayList<WEdge<VT>>());
+            }
+            success = this.addVertex(v);            
+        }
+        if (this.adjlist.size() < u.id()){
+            for (int i = this.adjlist.size(); i <= u.id() + 1; i++) {
+                this.adjlist.add(new ArrayList<WEdge<VT>>());
+            }
             success = this.addVertex(u);
+        }
+
         if (!success)
             return false;
 
@@ -101,14 +103,14 @@ public class WGraphP4<VT> implements WGraph<VT> {
         boolean edgeExists = this.areAdjacent(v, u);
         if (!edgeExists) {
             this.adjlist.get(v.id()).add(new WEdge<VT>(v, u, w));
-            this.adjlist.get(u.id()).add(new WEdge<VT>(u, v, w));
+            this.adjlist.get(u.id()).add(
+                this.adjlist.get(v.id()).get(this.adjlist.get(v.id()).size() - 1));
             this.numEdges++;
             return true;
         }
         return false;  // was already there
     }
 
-    
     @Override
     public boolean deleteEdge(GVertex<VT> v, GVertex<VT> u) {
         if (this.areAdjacent(v, u)) {
@@ -281,29 +283,4 @@ public class WGraphP4<VT> implements WGraph<VT> {
             return t2.compareTo(t1);
         }
     }
-
-    public static void main (String[] args){
-        WGraphP4<Character> g = new WGraphP4<Character>();
-        GVertex<Character> v = new GVertex<Character>('v', g.nextID());
-        GVertex<Character> u = new GVertex<Character>('u', g.nextID());
-        GVertex<Character> x = new GVertex<Character>('x', g.nextID());
-        WEdge e = new WEdge<Character>(u, v, 1);
-        WEdge e2 = new WEdge<Character>(v, x, 2);
-        g.addVertex(v);
-        g.addVertex(u);
-        g.addVertex(x);
-        g.addEdge(e);
-        g.addEdge(e2);
-
-
-        
-        List dfirst = g.depthFirst(u);
-
-        for (int i = 0; i < dfirst.size(); i++) {
- 
-            System.out.println(i + ". " + dfirst.get(i));
-
-        }
-
-   }
 }
