@@ -1,4 +1,7 @@
+/** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
+/** cs226 section 2 project 4 */
 /** Class to represent a vertex (in a graph).
+    @param <T> GVertex.
  */
 public class GVertex<T> implements Comparable<GVertex<T>> {
 
@@ -26,13 +29,15 @@ public class GVertex<T> implements Comparable<GVertex<T>> {
         return this.num;
     }
 
-    /** Get the data stored in theis vertex
+    /** Get the data stored in theis vertex.
      *  @return the data
      */
     public T data() {
         return this.data;
     }
 
+    /** Set the id of the vertex.
+ *      @param id id.*/
     public void setID(int id) {
         this.num = id;
     }

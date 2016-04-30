@@ -1,6 +1,7 @@
+/** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
+/** cs226 section 2 project 4 */
 import java.util.Collection;
 import java.util.ArrayList;
-import java.lang.Math;
 import java.util.Comparator;
 
 /** This is specifies a general Priority Queues of ordered values.
@@ -18,23 +19,26 @@ import java.util.Comparator;
 
     @param <T> Type of element values.
 */
-public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T> {
+public class PQHeap<T extends Comparable<? super T>> 
+                                     implements PriorityQueue<T> {
 
     /** Array List to put the heap in. */
     private ArrayList<T> heap;
+    /** Comparator. */
     private Comparator<T> c;
 
-    /** Default Constructor */
+    /** Default Constructor. */
     public PQHeap() {
-    	this.heap = new ArrayList();
-    	this.heap.add(null);
+        this.heap = new ArrayList();
+        this.heap.add(null);
         this.c = new DefaultComparator();
     }
 
-    /** Constructor with comparator */
+    /** Constructor with comparator. 
+ *      @param comparator comparator. */
     public PQHeap(Comparator<T> comparator) {
-    	this.heap = new ArrayList();
-    	this.heap.add(null);
+        this.heap = new ArrayList();
+        this.heap.add(null);
         this.c = comparator;
     }
     /** Insert a value. Duplicate values <b>do</b> end up in the
@@ -43,8 +47,8 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
      *  @param t Value to add.
      */
     public void insert(T t) {
-    	this.heap.add(t);
-    	this.bubbleUp(this.heap.size() - 1);
+        this.heap.add(t);
+        this.bubbleUp(this.heap.size() - 1);
     }
     
     /** Remove "best" value. This value is the "best" value in the
@@ -62,7 +66,8 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
             // If there is more than one, replace with the bottom element
             // and bubble down
             int last = this.heap.size() - 1; // get last index
-            this.heap.set(1, heap.get(last)); // swap last value to top of heap
+            //swap last value to top of heap
+            this.heap.set(1, this.heap.get(last));
             this.heap.remove(last); // remove the last one
             this.bubbleDown(1); // bubble down from the top
         }
@@ -84,9 +89,9 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
     /** No elements?
      *  @return True if queue is empty, false otherwise.
      */
-     public boolean isEmpty() {
+    public boolean isEmpty() {
         return (this.heap.size() == 1);
-     }
+    }
 
     /** Get the number of elements in the queue.
      *  @return the numbers
@@ -111,24 +116,25 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
 
         int lastIndex = this.heap.size() - 1;
 
-		int level = (int) (Math.floor(Math.log(lastIndex) / Math.log(2) + 1e-10));
+        int level = (int) (Math.floor(Math.log(lastIndex) 
+                                        / Math.log(2) + 1e-10));
         int levelstart = (int) (Math.pow(2, level) + 1e-10);
         int levelend = lastIndex;
 
-        while(level > 0) {
+        while (level > 0) {
             level--;
             levelstart = (int) (Math.pow(2, level) + 1e-10);
             levelend = (int) (Math.pow(2, level + 1) + 1e-10) - 1;
 
-        	for (int i = levelstart; i <= levelend; i++) {
-        		int childIndex = this.getChildIndex(i);
+            for (int i = levelstart; i <= levelend; i++) {
+                int childIndex = this.getChildIndex(i);
                 this.bubbleDown(i);
             }
         }
     }
 
 
-    /** Helper method bubbles up based on copmarator
+    /** Helper method bubbles up based on copmarator.
      *  @param index the index we want to bubble up
      */
     private void bubbleUp(int index) {
@@ -137,7 +143,8 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
         }
         int parentIndex = this.getParentIndex(index);
         // Swap and continue bubble up if heap is not in order
-        if (c.compare(this.heap.get(index), this.heap.get(parentIndex)) > 0) {
+        if (this.c.compare(this.heap.get(index), 
+                            this.heap.get(parentIndex)) > 0) {
             T temp = this.heap.get(index);
             this.heap.set(index, this.heap.get(parentIndex));
             this.heap.set(parentIndex, temp);
@@ -145,7 +152,7 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
         }
     }
 
-    /** Helper method bubbles down based on copmarator
+    /** Helper method bubbles down based on copmarator.
      *  @param index the index we want to bubble down
      */
     private void bubbleDown(int index) {
@@ -156,12 +163,14 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
         }
         // if both children are valid, check which one to swap with
         if ((childIndex + 1) < this.heap.size()) {
-        	if(c.compare(this.heap.get(childIndex), this.heap.get(childIndex + 1)) < 0) {
+            if (this.c.compare(this.heap.get(childIndex), 
+                             this.heap.get(childIndex + 1)) < 0) {
                 childIndex += 1; // switch to the second child
             }
         }
         // Swap and continue bubble down if we should
-        if (c.compare(this.heap.get(index), this.heap.get(childIndex)) < 0) {
+        if (this.c.compare(this.heap.get(index), 
+                                this.heap.get(childIndex)) < 0) {
             T temp = this.heap.get(index);
             this.heap.set(index, this.heap.get(childIndex));
             this.heap.set(childIndex, temp);
@@ -182,11 +191,12 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
             index -= 1;
         }
 
-        int level = (int)Math.floor(Math.log(index) / Math.log(2) + 1e-10); // level index in heap
-        int offset = index % (int)(Math.pow(2,level) + 1e-10);
+        int level = (int) Math.floor(Math.log(index) 
+                               / Math.log(2) + 1e-10); // level index in heap
+        int offset = index % (int) (Math.pow(2, level) + 1e-10);
         int plevel = level - 1;
         // the first index at the level
-        int plevelstart = (int)(Math.pow(2, plevel) + 1e-10);
+        int plevelstart = (int) (Math.pow(2, plevel) + 1e-10);
         int poffset = offset / 2;  // positions over level start
         return plevelstart + poffset;  // index of parent
     }
@@ -199,42 +209,55 @@ public class PQHeap<T extends Comparable<? super T>> implements PriorityQueue<T>
         // Level of current index
         int level = (int) (Math.floor(Math.log(index) / Math.log(2) + 1e-10));
         // Offset of current index
-        int offset = index % (int)(Math.pow(2, level) + 1e-10);
+        int offset = index % (int) (Math.pow(2, level) + 1e-10);
         // Level of child
         int clevel = level + 1;
-        int childIndex = (int)(Math.pow(2, clevel) + 1e-10) + (offset * 2);
+        int childIndex = (int) (Math.pow(2, clevel) + 1e-10) + (offset * 2);
 
-    	// Ensure that we can get to it and it's sibling in the heap
+        // Ensure that we can get to it and it's sibling in the heap
         this.heap.ensureCapacity(childIndex + 2); 
         return childIndex; // index of first child in heap
     }
-
-    private static class DefaultComparator<T extends Comparable<T>> implements Comparator<T> {
+    /** DefaultComparator class. 
+ *      @param <T> t. */
+    private static class DefaultComparator<T extends Comparable<T>> 
+                                               implements Comparator<T> {
+        /** Compares two T values. 
+ *        @param t1 t1.
+ *        @param t2 t2. 
+ *        @return int. */
         public int compare(T t1, T t2) {
             return t1.compareTo(t2);
         }
     }
-
+    /** Returns true if it's a heap, false if otherwise. 
+ *      @return boolean. */
     private boolean isHeap() {
         return this.isHeap(1);
     }
 
+    /** Returns true if specified section is a heap, false otherwise. 
+ *      @param index index.
+ *      @return boolean. */
     private boolean isHeap(int index) {
         int child = this.getChildIndex(index);
-        //check both childrent
+        //check both children
         if (child >= this.heap.size()) {
             return true;
         }
-        if (child+1 >= this.heap.size()) {
+        if (child + 1 >= this.heap.size()) {
             return true;
         }
 
-        if (c.compare(this.heap.get(index), this.heap.get(child)) >= 0 && c.compare(this.heap.get(index), this.heap.get(child+1)) >= 0) {
-            return this.isHeap(child) && this.isHeap(child+1);
+        if (this.c.compare(this.heap.get(index), this.heap.get(child)) 
+                            >= 0 && this.c.compare(this.heap.get(index), 
+                                              this.heap.get(child + 1)) >= 0) {
+            return this.isHeap(child) && this.isHeap(child + 1);
         }
         return false;
     }
-
+    /** Convertes heap to string. 
+ *      @return string version of heap. */
     public String toString() {
         return this.heap.toString() + this.isHeap();
     }

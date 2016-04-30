@@ -1,36 +1,59 @@
+/** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
+/** cs226 section 2 project 4 */
+/** Pixel Class. */
 public class Pixel {
-	private int row;
-	private int col;
-	private int data;
+    /** Row number. */
+    private int row;
+    /** Column number. */
+    private int col;
+    /** Data in pixel. */
+    private int data;
 
-	public Pixel() {
-		this.row = 0;
-		this.col = 0;
-		this.data = 0;
-	}
-	public Pixel(int r, int c, int d) {
-		this.row = r;
-		this.col = c;
-		this.data = d;
-	}
+    /** Pixel constructor. */
+    public Pixel() {
+        this.row = 0;
+        this.col = 0;
+        this.data = 0;
+    }
+    /** Pixel constructor. 
+ *      @param r r.
+ *      @param c c.
+ *      @param d d. */
+    public Pixel(int r, int c, int d) {
+        this.row = r;
+        this.col = c;
+        this.data = d;
+    }
 
-	public int r() {
-		return (this.data >> 16) & 0xFF;
-	}
-	public int g() {
-		return (this.data >> 8) & 0xFF;
-	}
-	public int b() {
-		return this.data & 0xFF;
-	}
+    /** Red. 
+ *      @return int. */
+    public int r() {
+        return (this.data >> 16) & 0xFF;
+    }
+    /** Green. 
+ *      @return int. */
+    public int g() {
+        return (this.data >> 8) & 0xFF;
+    }
+    /** Blue. 
+ *      @return int. */
+    public int b() {
+        return this.data & 0xFF;
+    }
 
-	public int row() {
-		return this.row;
-	}
-	public int col() {
-		return this.col;
-	}
-	public int value() {
-		return this.data;
-	}
+    /** Return row number. 
+ *      @return int. */
+    public int row() {
+        return this.row;
+    }
+    /** Return column number. 
+ *      @return int. */
+    public int col() {
+        return this.col;
+    }
+    /** Return data in pixel. 
+ *      @return int. */
+    public int value() {
+        return this.data;
+    }
 }
