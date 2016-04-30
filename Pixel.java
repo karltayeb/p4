@@ -1,4 +1,5 @@
 /** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
+/** cs226 section 2 project 4 */
 /** Pixel Class. */
 public class Pixel {
     /** Row number. */

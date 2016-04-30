@@ -1,4 +1,9 @@
+/** Natasha Bornhorst nbornho1 Richard Ding rding2 Karl Tayeb ktayeb1 */
+/** cs226 section 2 project 4 */
 
+/** Class to represent a vertex (in a graph).
+    @param <T> GVertex.
+ */
 public class GVertex<T> implements Comparable<GVertex<T>> {
 
     /* Note that the nextID variable had to be moved to the graph class. */
