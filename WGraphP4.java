@@ -6,28 +6,24 @@ import java.util.Comparator;
 import java.util.Stack;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.HashMap;
 
-/** WGraph Class. 
- *  @param <VT> vt. */
 public class WGraphP4<VT> implements WGraph<VT> {
 
     /** Used to sequentially generate vertex IDs for this graph! */
     private int nextID;
 
     /** the vertices */
-    private HashSet<GVertex<VT>> verts;
-    /* the edges */
+    private HashMap<Integer, GVertex<VT>> verts;
+    /** the adjacency list */
     public ArrayList<ArrayList<WEdge<VT>>> adjlist;
-    /** num edges. */
     private int numEdges;
 
-    // I made it not take a max number of pixels 
-    // since that doesnt make sense anymore
-    /** WGraph constructor. */
+    // I made it not take a max number of pixels since that doesnt make sense anymore
     public WGraphP4() {
         this.nextID = 0;
         this.numEdges = 0;
-        this.verts = new HashSet<GVertex<VT>>();
+        this.verts = new HashMap<Integer, GVertex<VT>>();
         this.adjlist = new ArrayList<ArrayList<WEdge<VT>>>();
     }
 
@@ -43,43 +39,32 @@ public class WGraphP4<VT> implements WGraph<VT> {
 
     @Override
     public int nextID() {
-        return this.nextID++;
+        return nextID++;
     }
 
     @Override
     public boolean addVertex(Object data) {
-        int properIndex = this.nextID;
-        this.verts.add(new GVertex(data, this.nextID++));
-        // add adjacency list for this vertex, 
-        // index should corresponds with vertex ID
-        // ensures that adjlist's size is the same as the index of the vertice
-        for (int i = this.adjlist.size(); i < properIndex + 1; i++) {
-            this.adjlist.add(new ArrayList<WEdge<VT>>());
-        }
-        return true;
+        GVertex<VT> v = new GVertex(data, this.nextID());
+        return this.addVertex(v);
     }
 
 
     @Override
     public boolean addVertex(GVertex<VT> v) {
-        if (this.verts.contains(v)) {
+        if (this.verts.containsKey(v.id())) {
             return false;  // there 
         }
-        int properIndex = v.id();
-        this.verts.add(v);
-        // add adjacency list for this vertex, 
-        // index should corresponds with vertex ID
-        // ensures that adjlist's .size is the same as the 
-        for (int i = this.adjlist.size(); i < properIndex + 1; i++) {
+        this.verts.put(v.id(), v);
+        // add adjacency list for this vertex, index should corresponds with vertex ID
+        // ensures that adjlist's .size is the same as the
+        for (int i = this.adjlist.size(); i < v.id() + 1; i++ ){
             this.adjlist.add(new ArrayList<WEdge<VT>>());
         }
         
         return true;
     }
     
-    /**
-     * @author Richard
-     */
+
     @Override
     public boolean addEdge(WEdge<VT> e) {
         boolean added = false;
@@ -87,23 +72,18 @@ public class WGraphP4<VT> implements WGraph<VT> {
         return added;
     }
 
-    /**
-     * @author Richard
+    /** Accessor method to get a vertex in the graph
+     * @ param id the vertex ID
+     * returns the vertex or null if not found
      */
+    public GVertex<VT> getVertex(int id) {
+        return this.verts.get(id);
+    }
+
+
+
     @Override
     public boolean addEdge(GVertex<VT> v, GVertex<VT> u, double w) {
-        
-        if (this.adjlist.size() < v.id()){
-            for (int i = this.adjlist.size(); i <= v.id() + 1; i++) {
-                this.adjlist.add(new ArrayList<WEdge<VT>>());
-            }          
-        }
-        if (this.adjlist.size() < u.id()){
-            for (int i = this.adjlist.size(); i <= u.id() + 1; i++) {
-                this.adjlist.add(new ArrayList<WEdge<VT>>());
-            }
-        }
-
         this.addVertex(v);
         this.addVertex(u); 
 
@@ -118,7 +98,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
         }
         return false;  // was already there
     }
-
+    
     @Override
     public boolean deleteEdge(GVertex<VT> v, GVertex<VT> u) {
         if (this.areAdjacent(v, u)) {
@@ -158,7 +138,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
     public ArrayList<GVertex<VT>> neighbors(GVertex<VT> v) {
         ArrayList<GVertex<VT>> temp = new ArrayList<GVertex<VT>>();
         for (WEdge<VT> marker: this.adjlist.get(v.id())) {
-            if (marker.source().id() != v.id()) {
+            if(marker.source().id() != v.id()) {
                 //the "source" vertex is the other vertex of the edge, not "v"
                 temp.add(marker.source());
             } else {
@@ -180,16 +160,12 @@ public class WGraphP4<VT> implements WGraph<VT> {
     }
 
     @Override
-    /* Note: allEdges() returns edges such that source.id() < end.id();
-     * (non-Javadoc)
-     * @see WGraph#allEdges()
-     */
     public List<WEdge<VT>> allEdges() {
         int nv = this.numVerts();
         HashSet<WEdge<VT>> edgeSet = new HashSet<WEdge<VT>>(nv);
         for (ArrayList<WEdge<VT>> edgelist : this.adjlist) {
             for (WEdge<VT> entry : edgelist) {
-                if (!edgeSet.contains(entry)) {
+                if (!edgeSet.contains(entry)){
                     edgeSet.add(entry);
                 }
             }
@@ -203,27 +179,24 @@ public class WGraphP4<VT> implements WGraph<VT> {
     @Override
     public List<GVertex<VT>> allVertices() {
         ArrayList<GVertex<VT>> vertlist = new ArrayList<GVertex<VT>>();
-        vertlist.addAll(this.verts);
+        vertlist.addAll(this.verts.values());
         return vertlist;
     }
 
-    /** depthFirst search. 
- *      @param v v. 
- *      @return List<GVertex<VT>> vt. */
     public List<GVertex<VT>> depthFirst(GVertex<VT> v) {
         List<GVertex<VT>> vlist = new ArrayList<GVertex<VT>>();
         Stack<GVertex<VT>> slist = new Stack<GVertex<VT>>();
         Set<GVertex<VT>> visited = new HashSet<GVertex<VT>>();
         slist.push(v);
        
-        while (!slist.empty()) {
-            GVertex<VT> newV = (GVertex<VT>) slist.pop();
-            if (!visited.contains(newV)) {
+        while(!slist.empty()){
+            GVertex<VT> newV = (GVertex<VT>)slist.pop();
+            if(!visited.contains(newV)) {
                 visited.add(newV);
                 vlist.add(newV);
  
-                ArrayList<GVertex<VT>> nlist = this.neighbors(newV);    
-                for (int i = 0; i < nlist.size(); i++) {
+                ArrayList<GVertex<VT>> nlist = neighbors(newV);    
+                for(int i = 0; i < nlist.size(); i++) {
                     GVertex<VT> neighbor = nlist.get(i);
                     if (!visited.contains(neighbor)) {
                         slist.push(neighbor);
@@ -231,8 +204,7 @@ public class WGraphP4<VT> implements WGraph<VT> {
                 }
             }
         }
-        return vlist;
-        
+        return vlist;     
     }
 
     /** Return a list of all the edges incident on vertex v.  
@@ -241,59 +213,57 @@ public class WGraphP4<VT> implements WGraph<VT> {
      */
     @Override
     public List<WEdge<VT>> incidentEdges(GVertex<VT> v) {
+        if (!this.verts.containsKey(v.id())) {
+            return null; // if the vertex isn't in the graph, no incidence
+        }
         return this.adjlist.get(v.id());
     }
     
-    /** Return a list of edges in a minimum spanning forest by
-     *  implementing Kruskal's algorithm using fast union/finds.
-     *  @return a list of the edges in the minimum spanning forest
-     */
-    @Override
-    public List<WEdge<VT>> kruskals() {
-        Partition roots = new Partition(this.allVertices().size());
-        List<WEdge<VT>> mst = new ArrayList<WEdge<VT>>();
-        List<WEdge<VT>> edges = this.allEdges();
+     /** Return a list of edges in a minimum spanning forest by
+      *  implementing Kruskal's algorithm using fast union/finds.
+      *  @return a list of the edges in the minimum spanning forest
+      */
+     @Override
+     public List<WEdge<VT>> kruskals() {
+         Partition roots = new Partition(this.allVertices().size());
+         List<WEdge<VT>> MST = new ArrayList<WEdge<VT>>();
+         List<WEdge<VT>> edges = this.allEdges();
 
-        //heap contains all the edges of the graph
-        PQHeap<WEdge<VT>> heap = new PQHeap<WEdge<VT>>(new ReverseComparator());
-        heap.init(this.allEdges());
+         //heap contains all the edges of the graph
+         PQHeap<WEdge<VT>> heap = new PQHeap<WEdge<VT>>(new ReverseComparator());
+         heap.init(this.allEdges());
       
-        // process all the edges IN ORDER OF WEIGHT    
-        while (!heap.isEmpty()) {
-            WEdge<VT> current = heap.peek();
-            int root1 = roots.find(current.source().id());   
-            int root2 = roots.find(current.end().id());     
+         // process all the edges IN ORDER OF WEIGHT    
+         while (!heap.isEmpty()) {
+             WEdge<VT> current = heap.peek();
+             int root1 = roots.find(current.source().id());   
+             int root2 = roots.find(current.end().id());     
              
-            //if the two roots are NOT equal, then union and add to MST
-            //otherwise, do nothing
-            if (root1 != root2) {
-                mst.add(current);
-                roots.union(root1, root2);
-            }
-            //remove the processed edge
-            heap.remove();
-        }
+             //if the two roots are NOT equal, then union and add to MST
+             //otherwise, do nothing
+             if(root1 != root2){
+                 MST.add(current);
+                 roots.union(root1, root2);
+             }
+             //remove the processed edge
+             heap.remove();
+         }
          
-        return mst;
-    }
+         return MST;
+     }
 
-    /** This method removes all the edges in the graph. */
-    public void clearEdges() {
+     /** This method removes all the edges in the graph. */
+     public void clearEdges() {
         for (List<WEdge<VT>> list : this.adjlist) {
             list.clear();
         }
-    }
+     }
      
     /** A comparator to make PQHeap a min-heap.
      *
      * @param <T>
      */
-    private static class ReverseComparator<T extends Comparable<T>> 
-                                                implements Comparator<T> {
-        /** compares T values. 
- *          @param t1 t1.
- *          @param t2 t2.
- *          @return int. */
+    private static class ReverseComparator<T extends Comparable<T>> implements Comparator<T> {
         public int compare(T t1, T t2) {
             return t2.compareTo(t1);
         }

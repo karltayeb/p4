@@ -128,7 +128,7 @@ public final class P4C {
      *  @return a list of the edges in the minimum spanning forest
      */
 
-    public static List<WEdge<Pixel>> segmenter(WGraph<Pixel> g, double kvalue) {
+    public static List<WEdge<Pixel>> segmenter(WGraphP4<Pixel> g, double kvalue) {
 
         Partition roots = new Partition(g.allVertices().size());
 
@@ -138,7 +138,7 @@ public final class P4C {
         List<WEdge<Pixel>> edges = g.allEdges();
 
         //set up MSTGroup: to have n arrayLists, where 
-        //heap contains all the edges of the graph
+        //heap contains all the edges of the graphWg
         PQHeap<WEdge<Pixel>> heap = 
             new PQHeap<WEdge<Pixel>>(new ReverseComparator<WEdge<Pixel>>());
         heap.init(g.allEdges());
@@ -196,7 +196,7 @@ public final class P4C {
      * index 1-6: minR, minG, minB, maxR, maxG, maxB
      * index 7: size of union
      */
-    private static int[] partialUnion(WGraph<Pixel> g, Partition p
+    private static int[] partialUnion(WGraphP4<Pixel> g, Partition p
                          , int root1, int root2, double k
                                            , Map<Integer, int[]> m) {
         //int[] is length 7: minR, minG, minB, maxR, maxG, maxB, SetSize
@@ -220,12 +220,12 @@ public final class P4C {
                 }
             }
             diffA = diff(A);*/
-            a[0] = g.allVertices().get(root1).data().r();
-            a[1] = g.allVertices().get(root1).data().g();
-            a[2] = g.allVertices().get(root1).data().b();           
-            a[3] = g.allVertices().get(root1).data().r();
-            a[4] = g.allVertices().get(root1).data().g();
-            a[5] = g.allVertices().get(root1).data().b();
+            a[0] = g.getVertex(root1).data().r();
+            a[1] = g.getVertex(root1).data().g();
+            a[2] = g.getVertex(root1).data().b();           
+            a[3] = g.getVertex(root1).data().r();
+            a[4] = g.getVertex(root1).data().g();
+            a[5] = g.getVertex(root1).data().b();
             a[6] = 1;
         }
         
@@ -246,12 +246,12 @@ public final class P4C {
                 }
             }
             diffA = diff(A);*/
-            b[0] = g.allVertices().get(root2).data().r();
-            b[1] = g.allVertices().get(root2).data().g();
-            b[2] = g.allVertices().get(root2).data().b();           
-            b[3] = g.allVertices().get(root2).data().r();
-            b[4] = g.allVertices().get(root2).data().g();
-            b[5] = g.allVertices().get(root2).data().b();
+            b[0] = g.getVertex(root2).data().r();
+            b[1] = g.getVertex(root2).data().g();
+            b[2] = g.getVertex(root2).data().b();           
+            b[3] = g.getVertex(root2).data().r();
+            b[4] = g.getVertex(root2).data().g();
+            b[5] = g.getVertex(root2).data().b();
             b[6] = 1;
         }
         //A, B are Lists of the Pixels in each Disjoint Set
